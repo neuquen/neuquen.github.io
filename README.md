@@ -1,1 +1,1 @@
-# neuquen.github.io
+# CSCI 171 - Visualization
