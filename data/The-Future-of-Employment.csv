@@ -318,7 +318,7 @@ Rank,Probability,Label,SOC_code,Occupation
 317,0.56,,25-9041,Teacher Assistants
 318,0.57,,45-1011,"First-Line Supervisors of Farming, Fishing, and Forestry Workers"
 319,0.57,,19-4031,Chemical Technicians
-320,0.57,,47-3015,"Helpers�Pipelayers, Plumbers, Pipefitters, and Steamfitters"
+320,0.57,,47-3015,"Helpers-Pipelayers, Plumbers, Pipefitters, and Steamfitters"
 321,0.57,1,13-1051,Cost Estimators
 322,0.57,,33-3052,Transit and Railroad Police
 323,0.57,,37-1012,"First-Line Supervisors of Landscaping, Lawn Service, and Groundskeeping Workers"
@@ -363,7 +363,7 @@ Rank,Probability,Label,SOC_code,Occupation
 362,0.65,,49-9021,"Heating, Air Conditioning, and Refrigeration Mechanics and Installers"
 363,0.65,,53-7041,Hoist and Winch Operators
 364,0.66,,37-2021,Pest Control Workers
-365,0.66,,51-9198,Helpers�Production Workers
+365,0.66,,51-9198,Helpers-Production Workers
 366,0.66,,43-9111,Statistical Assistants
 367,0.66,,37-2011,"Janitors and Cleaners, Except Maids and Housekeeping Cleaners"
 368,0.66,,49-3051,Motorboat Mechanics and Service Technicians
@@ -393,7 +393,7 @@ Rank,Probability,Label,SOC_code,Occupation
 392,0.71,,51-6011,Laundry and Dry-Cleaning Workers
 393,0.72,,39-3091,Amusement and Recreation Attendants
 394,0.72,,31-9095,Pharmacy Aides
-395,0.72,,47-3016,Helpers�Roofers
+395,0.72,,47-3016,Helpers-Roofers
 396,0.72,,53-7121,"Tank Car, Truck, and Ship Loaders"
 397,0.72,,49-9031,Home Appliance Repairers
 398,0.72,,47-2031,Carpenters
@@ -406,7 +406,7 @@ Rank,Probability,Label,SOC_code,Occupation
 405,0.74,,49-2011,"Computer, Automated Teller, and Office Machine Repairers"
 406,0.74,,39-9021,Personal Care Aides
 407,0.74,,27-4012,Broadcast Technicians
-408,0.74,,47-3013,Helpers�Electricians
+408,0.74,,47-3013,Helpers-Electricians
 409,0.75,,11-9131,Postmasters and Mail Superintendents
 410,0.75,,47-2044,Tile and Marble Setters
 411,0.75,,47-2141,"Painters, Construction and Maintenance"
@@ -432,7 +432,7 @@ Rank,Probability,Label,SOC_code,Occupation
 431,0.79,,53-3032,Heavy and Tractor-Trailer Truck Drivers
 432,0.79,,39-5093,Shampooers
 433,0.79,,47-2081,Drywall and Ceiling Tile Installers
-434,0.79,,49-9098,"Helpers�Installation, Maintenance, and Repair Workers"
+434,0.79,,49-9098,"Helpers-Installation, Maintenance, and Repair Workers"
 435,0.79,,49-3052,Motorcycle Mechanics
 436,0.79,,51-2011,"Aircraft Structure, Surfaces, Rigging, and Systems Assemblers"
 437,0.79,,45-4022,Logging Equipment Operators
@@ -461,7 +461,7 @@ Rank,Probability,Label,SOC_code,Occupation
 460,0.83,,35-2012,"Cooks, Institution and Cafeteria"
 461,0.83,,53-5011,Sailors and Marine Oilers
 462,0.83,,51-9023,"Mixing and Blending Machine Setters, Operators, and Tenders"
-463,0.83,,47-3011,"Helpers�Brickmasons, Blockmasons, Stonemasons, and Tile and Marble Setters"
+463,0.83,,47-3011,"Helpers-Brickmasons, Blockmasons, Stonemasons, and Tile and Marble Setters"
 464,0.83,,47-4091,Segmental Pavers
 465,0.83,,47-2131,"Insulation Workers, Floor, Ceiling, and Wall"
 466,0.83,,51-5112,Printing Press Operators
@@ -571,7 +571,7 @@ Rank,Probability,Label,SOC_code,Occupation
 570,0.92,,41-2031,Retail Salespersons
 571,0.92,,35-3021,"Combined Food Preparation and Serving Workers, Including Fast Food"
 572,0.92,,51-9399,"Production Workers, All Other"
-573,0.92,,47-3012,Helpers�Carpenters
+573,0.92,,47-3012,Helpers-Carpenters
 574,0.93,,51-9193,Cooling and Freezing Equipment Operators and Tenders
 575,0.93,,51-2091,Fiberglass Laminators and Fabricators
 576,0.93,,47-5013,"Service Unit Operators, Oil, Gas, and Mining"
@@ -601,7 +601,7 @@ Rank,Probability,Label,SOC_code,Occupation
 600,0.94,,43-4111,"Interviewers, Except Eligibility and Loan"
 601,0.94,,35-2015,"Cooks, Short Order"
 602,0.94,,53-7032,Excavating and Loading Machine and Dragline Operators
-603,0.94,,47-3014,"Helpers�Painters, Paperhangers, Plasterers, and Stucco Masons"
+603,0.94,,47-3014,"Helpers-Painters, Paperhangers, Plasterers, and Stucco Masons"
 604,0.94,,43-4081,"Hotel, Motel, and Resort Desk Clerks"
 605,0.94,,51-9197,Tire Builders
 606,0.94,,41-9091,"Door-to-Door Sales Workers, News and Street Vendors, and Related
