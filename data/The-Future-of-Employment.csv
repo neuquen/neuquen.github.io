@@ -165,7 +165,7 @@ Rank,Probability,Label,SOC_code,Occupation
 164,0.085,,39-9031,Fitness Trainers and Aerobics Instructors
 165,0.091,,11-9071,Gaming Managers
 166,0.097,,49-9051,Electrical Power-Line Installers and Repairers
-167,0.098,,33-3051,Police and Sheriff�s Patrol Officers
+167,0.098,,33-3051,Police and Sheriff's Patrol Officers
 168,0.099,,41-3041,Travel Agents
 169,0.1,0,35-1011,Chefs and Head Cooks
 170,0.1,,39-2011,Animal Trainers
@@ -256,7 +256,7 @@ Rank,Probability,Label,SOC_code,Occupation
 255,0.37,,51-9051,"Furnace, Kiln, Oven, Drier, and Kettle Operators and Tenders"
 256,0.37,,53-7061,Cleaners of Vehicles and Equipment
 257,0.37,,39-4021,Funeral Attendants
-258,0.37,,47-5081,Helpers�Extraction Workers
+258,0.37,,47-5081,Helpers-Extraction Workers
 259,0.37,,27-2011,Actors
 260,0.37,,53-7111,Mine Shuttle Car Operators
 261,0.38,,49-2095,"Electrical and Electronics Repairers, Powerhouse, Substation, and Relay"
