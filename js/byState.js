@@ -4,15 +4,17 @@
  * ByState - Object constructor function
  * @param _parentElement 	-- the HTML element in which to draw the visualization
  * @param _data				-- the ByState2014.csv data
+ * @param _mapData          -- USA json data, credit to Mike Bostock
  */
 
-ByState = function(_parentElement, _data){
+ByState = function(_parentElement, _data, _mapData){
     this.parentElement = _parentElement;
     this.data = _data;
+    this.mapData = _mapData;
     this.displayData = []; // see data wrangling
 
     // DEBUG RAW DATA
-    console.log(this.data);
+    console.log(this.mapData);
 
     this.initVis();
 }
@@ -61,8 +63,17 @@ ByState.prototype.initVis = function(){
     vis.svg.append("g")
         .attr("class", "y-axis axis");
 
-    // Initialize layout
+    //Albers projection
+    vis.projection = d3.geo.albersUsa()
+        .scale(1000)
+        .translate([vis.width / 2, vis.height / 2]);
 
+    //map GeoJSON coordinates to SVG paths
+    vis.path = d3.geo.path()
+        .projection(vis.projection);
+
+    //convert from topojson to geojson
+    vis.USA = topojson.feature(mapData, mapData.objects.states).features
 
 
     vis.wrangleData();
@@ -100,10 +111,14 @@ ByState.prototype.updateVis = function(){
 
 
     // Data Join
-
+    //vis.map = vis.svg.selectAll("path")
+    //    .data(vis.USA);
 
     // Enter/Update/Exit
-
+    //vis.map.enter()
+    //    .append(vis.path)
+    //    .attr("class", "feature")
+    //    .attr("d", vis.path);
 
 
     // Call axis functions with the new domain
