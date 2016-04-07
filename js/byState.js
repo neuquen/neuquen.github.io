@@ -1,26 +1,30 @@
+//Global variables
+var mapData = [];
+
 /*
  * Load the data
  */
 loadData();
 function loadData() {
-    d3.csv("data/ByState2014.csv", function(error, csv) {
-        if (error) throw error;
+    var queue = d3_queue.queue();
 
-        //Process and clean the data
-        //csv.forEach(function(d){
-        //    // Convert string to 'date object'
-        //    d.YEAR = formatDate.parse(d.YEAR);
-        //
-        //    // Convert numeric values to 'numbers'
-        //    d.TEAMS = +d.TEAMS;
-        //    d.MATCHES = +d.MATCHES;
-        //    d.GOALS = +d.GOALS;
-        //    d.AVERAGE_GOALS = +d.AVERAGE_GOALS;
-        //    d.AVERAGE_ATTENDANCE = +d.AVERAGE_ATTENDANCE;
-        //});
+    queue
+        .defer(d3.csv, "data/ByState2014.csv")
+        .defer(d3.json, "data/us.json")
+        .await(function(error, csv, map){
+            if (error) throw error;
 
-        // Draw the visualization for the first time
-        new ByState("by-state", csv);
+            //Process and clean the data
+            //source for regex to remove non-numeric chars from strings:
+            //http://stackoverflow.com/questions/1862130/strip-non-numeric-characters-from-string
+            csv.forEach(function(d){
+                d.TOT_EMP = +d.TOT_EMP.replace(/\D/g,'');
+                d.OCC_CODE = +d.OCC_CODE.replace(/\D/g,'');
+                d.JOBS_1000 = +d.JOBS_1000;
+            });
+
+            // Draw the visualization for the first time
+            new ByState("by-state", csv, map);
     });
 }
 
