@@ -1,4 +1,28 @@
+/*
+ * Load the data
+ */
+loadData();
+function loadData() {
+    d3.csv("data/MarketShareData.csv", function(error, csv) {
+        if (error) throw error;
 
+        //Process and clean the data
+        //csv.forEach(function(d){
+        //    // Convert string to 'date object'
+        //    d.YEAR = formatDate.parse(d.YEAR);
+        //
+        //    // Convert numeric values to 'numbers'
+        //    d.TEAMS = +d.TEAMS;
+        //    d.MATCHES = +d.MATCHES;
+        //    d.GOALS = +d.GOALS;
+        //    d.AVERAGE_GOALS = +d.AVERAGE_GOALS;
+        //    d.AVERAGE_ATTENDANCE = +d.AVERAGE_ATTENDANCE;
+        //});
+
+        // Draw the visualization for the first time
+        new MarketShareData("market-share-data", csv);
+    });
+}
 
 /*
  * MarketShareData - Object constructor function

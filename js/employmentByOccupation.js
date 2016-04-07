@@ -1,4 +1,28 @@
+/*
+ * Load the data
+ */
+loadData();
+function loadData() {
+    d3.csv("data/employment-by-occupation.csv", function(error, csv) {
+        if (error) throw error;
 
+        //Process and clean the data
+        //csv.forEach(function(d){
+        //    // Convert string to 'date object'
+        //    d.YEAR = formatDate.parse(d.YEAR);
+        //
+        //    // Convert numeric values to 'numbers'
+        //    d.TEAMS = +d.TEAMS;
+        //    d.MATCHES = +d.MATCHES;
+        //    d.GOALS = +d.GOALS;
+        //    d.AVERAGE_GOALS = +d.AVERAGE_GOALS;
+        //    d.AVERAGE_ATTENDANCE = +d.AVERAGE_ATTENDANCE;
+        //});
+
+        // Draw the visualization for the first time
+        new EmploymentByOccupation("employment-by-occupation", csv);
+    });
+}
 
 /*
  * EmploymentByOccupation - Object constructor function
@@ -16,8 +40,6 @@ EmploymentByOccupation = function(_parentElement, _data){
 
     this.initVis();
 }
-
-
 
 /*
  * Initialize visualization (static content, e.g. SVG area or axes)
