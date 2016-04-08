@@ -1,6 +1,8 @@
 //Global variables
 var mapData = [];
 
+
+
 /*
  * Load the data
  *
@@ -10,6 +12,13 @@ var mapData = [];
  *
  *         retrieving state names from us.json:
  *         http://stackoverflow.com/questions/28305205/how-to-add-label-to-each-state-in-d3-js-albersusa
+ *
+ *         legend library:
+ *         http://d3-legend.susielu.com/
+ *
+ *         Mike Bostock's colorbrewer (revised from Cynthia Brewer's http://colorbrewer.org/)
+ *         https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js
+ *
  */
 loadData();
 function loadData() {
@@ -37,7 +46,11 @@ function loadData() {
             });
             // Draw the visualization for the first time
             new ByState("by-state", csv, map);
+
     });
+
+
+
 }
 
 /*
@@ -83,9 +96,10 @@ ByState = function(_parentElement, _data, _mapData){
         }
     }
 
-   // console.log(this.jobCategoryDict);
+    //console.log(this.jobCategoryDict);
 
     this.initVis();
+
 }
 
 
@@ -99,6 +113,7 @@ ByState.prototype.initVis = function(){
 
     vis.margin = { top: 40, right: 0, bottom: 60, left: 60 };
 
+    //width was at 1000
     vis.width = 800 - vis.margin.left - vis.margin.right,
         vis.height = 600 - vis.margin.top - vis.margin.bottom;
 
@@ -132,18 +147,31 @@ ByState.prototype.initVis = function(){
     vis.svg.append("g")
         .attr("class", "y-axis axis");
 
+    vis.svg.append("g")
+        .attr("class", "legendQuant")
+        //.attr("transform", "translate(750,100)"); // + vis.height/3 + ")");
+        .attr("transform", "translate(0,20)");
+    
     //Albers projection
     vis.projection = d3.geo.albersUsa()
         .scale(1000)
-        .translate([vis.width / 2, vis.height/2]);
+        //.translate([vis.width/3, vis.height/2]);//[vis.width / 2, vis.height/2]);
+        .translate([vis.width/2, vis.height/1.5]);
 
     //map GeoJSON coordinates to SVG paths
     vis.path = d3.geo.path()
         .projection(vis.projection);
 
+    vis.selection = "Management";  //default selection from drop-down
+
+    //get user selection from drop down menu
+    $('#mapDropdown').change(function(){
+        vis.selection = $(this).val();
+        vis.wrangleData();
+    });
+
     vis.wrangleData();
 }
-
 
 
 /*
@@ -153,18 +181,12 @@ ByState.prototype.initVis = function(){
 ByState.prototype.wrangleData = function(){
     var vis = this;
 
-    // Filter, aggregate or modify the data
-    //get user selection from drop-down
-    vis.dropdown = document.getElementById("dropdown");
-    vis.selection = dropdown.options[dropdown.selectedIndex].value;
-
-    console.log("selection is "+vis.selection);
-    //get bin of colors for user-selected field
-    vis.colors = vis.getColors();
-
     //set color range
-    vis.color = d3.scale.quantize().range(vis.colors);
+    //TODO: pick different color range?
+    // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js
+    vis.color = d3.scale.quantize().range(colorbrewer.Blues[9]);
 
+    //make data array that has job data for each state, only for user-selected job
     vis.selectionArray = vis.jobFieldDict.filter(function(item) {
         return (item.jobField.indexOf(vis.selection) > -1);
     });
@@ -176,8 +198,6 @@ ByState.prototype.wrangleData = function(){
     vis.min = vis.selectionArray[0].jobsPer1000;
     vis.max = vis.selectionArray[vis.selectionArray.length - 1].jobsPer1000;
 
-    //console.log(vis.selectionArray);
-
     vis.color.domain([vis.min, vis.max]);
 
     //add data re: drop-down selection to map data
@@ -185,6 +205,7 @@ ByState.prototype.wrangleData = function(){
 
     // Update the visualization
     vis.updateVis();
+    vis.makeLegend();
 }
 
 
@@ -222,6 +243,25 @@ ByState.prototype.updateVis = function(){
 
     vis.map.exit().remove();
 
+
+
+}
+
+ByState.prototype.makeLegend = function(){
+    var vis = this;
+
+    vis.selectedJobField();
+
+    vis.legend = d3.legend.color()
+        .labelFormat(d3.format(".0f"))
+        .scale(vis.color)
+        .orient("horizontal")
+        .labelAlign("start")
+        .shapeWidth("75")
+        .title(vis.selectedField + " Jobs per 1000 Jobs in Each State");
+
+    vis.svg.select(".legendQuant")
+        .call(vis.legend);
 }
 
 
@@ -243,49 +283,48 @@ ByState.prototype.addSelectionToMapData = function(){
         if (item.jobField.indexOf(vis.selection) > -1){             //if job field matches selection
             for (var j = 0; j < vis.USA.length; j++){               //for all map data,
                 var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
-                //console.log("item.state is "+item.state + " map state is "+ mapState);
+
                 if (mapState.indexOf(item.state) > -1) {                       //if state on map matches,
-                    //console.log("adding "+ item.jobsPer1000 + " to "+ vis.selection + " for "+item.state);
+
                     vis.USA[j].properties[vis.selection] = item.jobsPer1000;//add jobs data to map data
                     break;
                 }
             }
         }
-        else{
-            //console.log("NO MATCH: item.jobField is "+item.jobField + " selection is "+ vis.selection);
-        }
+
     });
 
-    //console.log(this.USA);
+
+}
+
+ByState.prototype.selectedJobField = function(){
+    var vis = this;
+    vis.selectedField;
+
+    switch (vis.selection) {
+        case "Management":
+            vis.selectedField = "Management";
+            break;
+        case "Business":
+            vis.selectedField = "Business and Financial Operations";
+            break;
+        case "Computer":
+            vis.selectedField = "Computer and Mathematical";
+            break;
+        case "Architecture":
+            vis.selectedField = "Architecture and Engineering";
+            break;
+        case "Life":
+            vis.selectedField = "Life, Physical, and Social Science";
+            break;
+        case "Community":
+            vis.selectedField = "Community and Social Services";
+            break;
+    }
 
 }
 
 
-/**
- * Returns an array of color-blind safe, single-hue colors for sequential
- * data.  The color family depends on user's selection from drop-down menu.
- *
- * Source: http://colorbrewer2.org/
- *
- * @param selection              user's selection from drop-down menu
- * @returns {string[]}           array of color-blind-safe colors for sequential data
- */
-ByState.prototype.getColors = function(){
-    var vis =this;
 
-    if (vis.selection == "Management") {
-        console.log("COLOR for management");
-        return ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#31a354", "#006d2c"];//greens
-    }
-    else if (vis.selection == "Business") {
-        return ["#feedde", "#fdbe85", "#fd8d3c", "#e6550d", "#a63603"];          //oranges
-    }
-    else if (vis.selection == "Computer") {
-        return ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#de2d26", "#a50f15"];//reds
-    }
-    else if (vis.selection == "Architecture") {
-        return ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"];          //blues
-    }
 
-    return ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#6a51a3"];                        //purples
-}
+

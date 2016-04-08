@@ -22,7 +22,7 @@
                 <td class="filter-table-td">
                     <div class="user-data">
                         <!-- 2010 Major SOC Groups: http://www.bls.gov/soc/major_groups.htm -->
-                        <select id="dropdown" onchange="ByState.prototype.wrangleData">
+                        <select id="mapDropdown">
                             <option value="Management">Management</option>
                             <option value="Business">Business and Financial Operations</option>
                             <option value="Computer">Computer and Mathematical</option>
@@ -46,8 +46,6 @@
 </div>
 
 
-
-
 <!-- Latest minified jQuery -->
 <script src="js/jquery-2.2.0.min.js"></script>
 
@@ -60,6 +58,12 @@
 <!-- Additional Libraries -->
 <script src="js/d3-queue.v2.min.js"></script>
 <script src="js/topojson.js"></script>
+
+<!-- Legend credit: http://d3-legend.susielu.com/ -->
+<script src="js/d3-legend.min.js"></script>
+
+<!-- color brewer: Bike Bostock https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js -->
+<script src="js/colorbrewer.js"></script>
 
 <!-- Custom Scripts -->
 <script src="js/main.js"></script>
