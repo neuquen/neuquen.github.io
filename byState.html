@@ -15,8 +15,33 @@
 <!-- Include body content here -->
 <div class="container">
 
+    <!-- Map: Drop Down Menu -->
+    <div class="row">
+        <div class="col-md-6 col-lg-6 centerGridCols">
+            <table id="filter-table"><tr>
+                <td class="filter-table-td">
+                    <div class="user-data">
+                        <!-- 2010 Major SOC Groups: http://www.bls.gov/soc/major_groups.htm -->
+                        <select id="dropdown" onchange="ByState.prototype.wrangleData">
+                            <option value="Management">Management</option>
+                            <option value="Business">Business and Financial Operations</option>
+                            <option value="Computer">Computer and Mathematical</option>
+                            <option value="Architecture">Architecture and Engineering</option>
+                            <option value="Life">Life, Physical, and Social Science</option>
+                        </select>
+                    </div>
+                </td>
+                <td class="filter-table-td">
+                </td>
+            </tr></table>
+        </div>
+        <div class="col-md-4 col-lg-4 centerGridCols"></div>
+    </div>
+
     <!-- Visualization Placeholder -->
-    <div id="by-state"></div>
+    <div id="by-state">
+
+    </div>
 
 </div>
 
