@@ -25,7 +25,7 @@ function loadData() {
     var queue = d3_queue.queue();
 
     queue
-        .defer(d3.csv, "data/ByState2014.csv")
+        .defer(d3.csv, "data/ByState2015.csv")
         .defer(d3.json, "data/us.json")
         .defer(d3.tsv, "data/us-state-names.tsv")
         .await(function(error, csv, map, tsv){
@@ -44,6 +44,8 @@ function loadData() {
             tsv.forEach(function(d,i){
                 this.stateNames[d.id] = d.name;
             });
+
+
             // Draw the visualization for the first time
             new ByState("by-state", csv, map);
 
@@ -74,33 +76,40 @@ ByState = function(_parentElement, _data, _mapData){
     this.USA = topojson.feature(this.mapData, this.mapData.objects.states).features
 
     //console.log(this.USA);
-    this.jobFieldDict = [];
+    this.jobFieldDict = [];   //key = state, val = major job field data (eg, Education)
+    this.jobTitlesDict = [];  //key = state, val = job title data (eg, Library Assistant)
 
-    //make dict where key=state name, values=major job field, jobs per 1000 in that field
+    //make dicts
     for (var i = 0; i < this.data.length; i++) {
 
         if (this.data[i].OCC_GROUP == "major"){
+            this.jobFieldDict.push({
+                state: this.data[i].STATE,
+                jobField: this.data[i].OCC_TITLE,    //major job field
+                jobsPer1000: this.data[i].JOBS_1000  //jobs in this field per 1000 jobs in state
+            });
+        }
+        else if (this.data[i].OCC_GROUP == "detailed"){
 
-            //if state is in the dict, add major job category and number of jobs per 1000
-            if (this.jobFieldDict[this.data[i].STATE]){
-                this.jobFieldDict[this.data[i].STATE].jobField = this.data[i].OCC_TITLE;
-                this.jobFieldDict[this.data[i].STATE].jobsPer1000 = this.data[i].JOBS_1000;
-            }
-            else {
-                this.jobFieldDict.push({
-                    state: this.data[i].STATE,
-                    jobField: this.data[i].OCC_TITLE,
-                    jobsPer1000: this.data[i].JOBS_1000
-                });
-            }
+            this.OCC_CODE = this.data[i].OCC_CODE;
+            this.getJobCategory();  //sets vis.jobCategory - for OCC_CODE, returns major job field
+
+            this.jobTitlesDict.push({
+                state: this.data[i].STATE,
+                jobField: this.jobCategory,
+                jobTitle: this.data[i].OCC_TITLE,
+                jobsPer1000: this.data[i].JOBS_1000
+            });
         }
     }
 
-    //console.log(this.jobCategoryDict);
+    //console.log(this.jobFieldDict);
 
     this.initVis();
 
 }
+
+
 
 
 
@@ -151,7 +160,7 @@ ByState.prototype.initVis = function(){
         .attr("class", "legendQuant")
         //.attr("transform", "translate(750,100)"); // + vis.height/3 + ")");
         .attr("transform", "translate(0,20)");
-    
+
     //Albers projection
     vis.projection = d3.geo.albersUsa()
         .scale(1000)
@@ -177,7 +186,6 @@ ByState.prototype.initVis = function(){
 /*
  * Data wrangling - Filter, aggregate, modify data
  */
-
 ByState.prototype.wrangleData = function(){
     var vis = this;
 
@@ -218,6 +226,19 @@ ByState.prototype.wrangleData = function(){
 ByState.prototype.updateVis = function(){
     var vis = this;
 
+    //INIT TOOLTIP
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .html(function(d){
+
+            vis.hoveredState = stateNames[d.id];
+
+            return vis.hoverStateData(); //get country data for tooltip
+        });
+
+    vis.svg.call(tip);
+
+
     // Data Join
     vis.map = vis.svg.selectAll("path")
         .data(vis.USA);
@@ -229,23 +250,45 @@ ByState.prototype.updateVis = function(){
         .attr("d", vis.path);
 
     //vis.map.style("fill", '#ccc');
-    vis.map.style("fill", function(d){
-        var value = d.properties[vis.selection];
+    vis.map
+        .style("fill", function(d){
+            var value = d.properties[vis.selection];
 
-        if (value) {
-            return vis.color(value);
-        }
-        else {
-            return "#ccc";
-        }
-    });
+            if (value) {
+                return vis.color(value);
+            }
+            else {
+                return "#ccc";
+            } })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
 
     vis.map.exit().remove();
 
-
-
 }
+
+
+
+ByState.prototype.hoverStateData = function(){
+    var vis = this;
+    console.log("HOVERED STATE: "+ vis.hoveredState);
+
+    var str = vis.hoveredState + "<br>";
+
+    vis.jobTitlesDict.forEach(function(item) {
+
+        if (item.state == vis.hoveredState && item.jobField == vis.selection){
+            str += item.jobTitle + ": " + item.jobsPer1000 + "<br>";
+        }
+
+    });
+
+   //return str;
+    return vis.hoveredState;
+}
+
+
 
 ByState.prototype.makeLegend = function(){
     var vis = this;
@@ -258,7 +301,7 @@ ByState.prototype.makeLegend = function(){
         .orient("horizontal")
         .labelAlign("start")
         .shapeWidth("75")
-        .title(vis.selectedField + " Jobs per 1000 Jobs in Each State");
+        .title(vis.selectedField + " Jobs per 1000 Jobs in Each State in 2015");
 
     vis.svg.select(".legendQuant")
         .call(vis.legend);
@@ -282,13 +325,16 @@ ByState.prototype.addSelectionToMapData = function(){
 
         if (item.jobField.indexOf(vis.selection) > -1){             //if job field matches selection
             for (var j = 0; j < vis.USA.length; j++){               //for all map data,
+
                 var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
 
-                if (mapState.indexOf(item.state) > -1) {                       //if state on map matches,
+                if (mapState == item.state){                      //if state on map matches,
 
                     vis.USA[j].properties[vis.selection] = item.jobsPer1000;//add jobs data to map data
                     break;
                 }
+
+
             }
         }
 
@@ -296,6 +342,106 @@ ByState.prototype.addSelectionToMapData = function(){
 
 
 }
+
+
+
+//source: http://www.bls.gov/oes/current/oes_al.htm
+ByState.prototype.getJobCategory = function(){
+
+    var vis = this;
+    var code = vis.OCC_CODE;
+
+    if (code < 130000){
+        vis.jobCategory = "Management";
+        return;
+    }
+    else if (code < 150000){
+        vis.jobCategory = "Business";
+        return;
+    }
+    else if (code < 170000){
+        vis.jobCategory = "Computer";
+        return;
+    }
+    else if (code < 190000){
+        vis.jobCategory = "Architecture";
+        return;
+    }
+    else if (code < 210000){
+        vis.jobCategory = "Life";
+        return;
+    }
+    else if (code < 230000){
+        vis.jobCategory = "Community";
+        return;
+    }
+    else if (code < 250000){
+        vis.jobCategory = "Legal";
+        return;
+    }
+    else if (code < 270000){
+        vis.jobCategory = "Education";
+        return;
+    }
+    else if (code < 290000){
+        vis.jobCategory = "Arts";
+        return;
+    }
+    else if (code < 310000){
+        vis.jobCategory = "Practitioners";
+        return;
+    }
+    else if (code < 330000){
+        vis.jobCategory = "Healthcare";
+        return;
+    }
+    else if (code < 350000){
+        vis.jobCategory = "Protective";
+        return;
+    }
+    else if (code < 370000){
+        vis.jobCategory = "Food";
+        return;
+    }
+    else if (code < 390000){
+        vis.jobCategory = "Building";
+        return;
+    }
+    else if (code < 410000){
+        vis.jobCategory = "Personal";
+        return;
+    }
+    else if (code < 430000){
+        vis.jobCategory = "Sales";
+        return;
+    }
+    else if (code < 450000){
+        vis.jobCategory = "Office";
+        return;
+    }
+    else if (code < 470000){
+        vis.jobCategory = "Farming";
+        return;
+    }
+    else if (code < 490000){
+        vis.jobCategory = "Construction";
+        return;
+    }
+    else if (code < 510000){
+        vis.jobCategory = "Installation";
+        return;
+    }
+    else if (code < 530000){
+        vis.jobCategory = "Production";
+        return;
+    }
+    else {
+        vis.jobCategory = "Transportation";
+    }
+
+}
+
+
 
 ByState.prototype.selectedJobField = function(){
     var vis = this;
@@ -319,6 +465,57 @@ ByState.prototype.selectedJobField = function(){
             break;
         case "Community":
             vis.selectedField = "Community and Social Services";
+            break;
+        case "Legal":
+            vis.selectedField = "Legal";
+            break;
+        case "Education":
+            vis.selectedField = "Education, Training and Library";
+            break;
+        case "Arts":
+            vis.selectedField = "Arts, Design, Entertainment, Sports, and Media";
+            break;
+        case "Practitioners":
+            vis.selectedField = "Healthcare Practitioners and Technical";
+            break;
+        case "Healthcare":
+            vis.selectedField = "Healthcare Support";
+            break;
+        case "Protective":
+            vis.selectedField = "Protective Service";
+            break;
+        case "Food":
+            vis.selectedField = "Food Preparation and Serving Related";
+            break;
+        case "Building":
+            vis.selectedField = "Building and Grounds Cleaning and Maintenance";
+            break;
+        case "Personal":
+            vis.selectedField = "Personal Care and Service";
+            break;
+        case "Sales":
+            vis.selectedField = "Sales and Related";
+            break;
+        case "Office":
+            vis.selectedField = "Office and Administrative Support";
+            break;
+        case "Farming":
+            vis.selectedField = "Farming, Fishing, and Forestry";
+            break;
+        case "Construction":
+            vis.selectedField = "Construction and Extraction";
+            break;
+        case "Installation":
+            vis.selectedField = "Installation, Maintenance, and Repair";
+            break;
+        case "Production":
+            vis.selectedField = "Production";
+            break;
+        case "Transportation":
+            vis.selectedField = "Transportation and Material Moving";
+            break;
+        case "Military":
+            vis.selectedField = "Military";
             break;
     }
 
