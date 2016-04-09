@@ -22,6 +22,10 @@ var mapData = [];
  */
 loadData();
 function loadData() {
+    var round = d3.format("d");
+    var format = d3.format("," + round);
+    var twoDecimal = d3.format(".2f");
+
     var queue = d3_queue.queue();
 
     queue
@@ -35,9 +39,9 @@ function loadData() {
             //source for regex to remove non-numeric chars from strings:
             //http://stackoverflow.com/questions/1862130/strip-non-numeric-characters-from-string
             csv.forEach(function(d){
-                d.TOT_EMP = +d.TOT_EMP.replace(/\D/g,'');
+                d.TOT_EMP = format(+d.TOT_EMP.replace(/\D/g,''));
                 d.OCC_CODE = +d.OCC_CODE.replace(/\D/g,'');
-                d.JOBS_1000 = +d.JOBS_1000;
+                d.JOBS_1000 = twoDecimal(+d.JOBS_1000);
             });
 
             this.stateNames = {};
@@ -76,8 +80,10 @@ ByState = function(_parentElement, _data, _mapData){
     this.USA = topojson.feature(this.mapData, this.mapData.objects.states).features
 
     //console.log(this.USA);
-    this.jobFieldDict = [];   //key = state, val = major job field data (eg, Education)
-    this.jobTitlesDict = [];  //key = state, val = job title data (eg, Library Assistant)
+    this.jobFieldDict = [];   //major job field data (eg, Education)
+    this.jobTitlesDict = [];  //job title data (eg, Library Assistant)
+    this.totalJobsInState = []; //key = state, val = total num jobs in state
+    this.percentJobs = []; //key = state, val = major job field, percent of jobs in that field
 
     //make dicts
     for (var i = 0; i < this.data.length; i++) {
@@ -86,7 +92,8 @@ ByState = function(_parentElement, _data, _mapData){
             this.jobFieldDict.push({
                 state: this.data[i].STATE,
                 jobField: this.data[i].OCC_TITLE,    //major job field
-                jobsPer1000: this.data[i].JOBS_1000  //jobs in this field per 1000 jobs in state
+                jobsPer1000: this.data[i].JOBS_1000,  //jobs in this field per 1000 jobs in state
+                totalJobs: this.data[i].TOT_EMP,
             });
         }
         else if (this.data[i].OCC_GROUP == "detailed"){
@@ -98,12 +105,32 @@ ByState = function(_parentElement, _data, _mapData){
                 state: this.data[i].STATE,
                 jobField: this.jobCategory,
                 jobTitle: this.data[i].OCC_TITLE,
-                jobsPer1000: this.data[i].JOBS_1000
+                jobsPer1000: this.data[i].JOBS_1000,
+                numJobs: this.data[i].TOT_EMP
             });
+        }
+        else if (this.data[i].OCC_GROUP == "total"){
+            this.totalJobsInState[this.data[i].STATE] = this.data[i].TOT_EMP;
         }
     }
 
-    //console.log(this.jobFieldDict);
+
+    //make dict that stores percent of jobs per state in a particular job field
+    //TODO - delete these parts? percentages don't work well b/c all too small
+    for (i=0; i < this.jobFieldDict.length; i++){
+
+        var state = this.jobFieldDict[i].state;
+        var allJobsInState = this.totalJobsInState[state];
+
+        this.percentJobs.push({
+            state: state,
+            jobField: this.jobFieldDict[i].jobField,
+            percent: parseFloat(this.jobFieldDict[i].totalJobs/allJobsInState).toFixed(2)
+        });
+    }
+
+
+
 
     this.initVis();
 
@@ -165,7 +192,7 @@ ByState.prototype.initVis = function(){
     vis.projection = d3.geo.albersUsa()
         .scale(1000)
         //.translate([vis.width/3, vis.height/2]);//[vis.width / 2, vis.height/2]);
-        .translate([vis.width/2, vis.height/1.5]);
+        .translate([vis.width/2.5, vis.height/1.5]);
 
     //map GeoJSON coordinates to SVG paths
     vis.path = d3.geo.path()
@@ -179,8 +206,29 @@ ByState.prototype.initVis = function(){
         vis.wrangleData();
     });
 
+    vis.initPopUpTable();
     vis.wrangleData();
 }
+
+
+ByState.prototype.initPopUpTable = function(){
+    var vis = this;
+    vis.marginTable = { top: 40, right: 0, bottom: 60, left: 60 };
+
+    //width was at 1000
+    vis.widthTable = 400 - vis.marginTable.left - vis.marginTable.right,
+        vis.heightTable = 600 - vis.marginTable.top - vis.marginTable.bottom;
+
+    // SVG drawing area
+    vis.svgTable = d3.select("#map-table").append("svg")
+        .attr("width", vis.widthTable + vis.marginTable.left + vis.marginTable.right)
+        .attr("height", vis.heightTable + vis.marginTable.top + vis.marginTable.bottom)
+        .append("g")
+        .attr("transform", "translate(" + vis.marginTable.left + "," + vis.marginTable.top + ")");
+}
+
+
+
 
 
 /*
@@ -193,6 +241,7 @@ ByState.prototype.wrangleData = function(){
     //TODO: pick different color range?
     // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js
     vis.color = d3.scale.quantize().range(colorbrewer.Blues[9]);
+
 
     //make data array that has job data for each state, only for user-selected job
     vis.selectionArray = vis.jobFieldDict.filter(function(item) {
@@ -207,6 +256,23 @@ ByState.prototype.wrangleData = function(){
     vis.max = vis.selectionArray[vis.selectionArray.length - 1].jobsPer1000;
 
     vis.color.domain([vis.min, vis.max]);
+
+
+    /*
+     //PERCENT JOBS
+     vis.selectionArray = vis.percentJobs.filter(function(item) {
+     return (item.jobField.indexOf(vis.selection) > -1);
+     });
+
+     vis.selectionArray.sort(function (a, b){
+     return a.percent - b.percent;
+     });
+
+     vis.min = vis.selectionArray[0].percent;
+     vis.max = vis.selectionArray[vis.selectionArray.length - 1].percent;
+
+     vis.color.domain([vis.min, vis.max]);
+     */
 
     //add data re: drop-down selection to map data
     vis.addSelectionToMapData();
@@ -230,9 +296,8 @@ ByState.prototype.updateVis = function(){
     var tip = d3.tip()
         .attr('class', 'd3-tip')
         .html(function(d){
-
             vis.hoveredState = stateNames[d.id];
-
+            vis.popUpTable();
             return vis.hoverStateData(); //get country data for tooltip
         });
 
@@ -269,23 +334,87 @@ ByState.prototype.updateVis = function(){
 }
 
 
-
+//make title for pop-up table
 ByState.prototype.hoverStateData = function(){
     var vis = this;
-    console.log("HOVERED STATE: "+ vis.hoveredState);
-
     var str = vis.hoveredState + "<br>";
 
-    vis.jobTitlesDict.forEach(function(item) {
+    var filteredDict = vis.jobFieldDict.filter(function(item){
+        return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
+    })
 
-        if (item.state == vis.hoveredState && item.jobField == vis.selection){
-            str += item.jobTitle + ": " + item.jobsPer1000 + "<br>";
-        }
+    console.log("jobs per 1000: "+ filteredDict[0].jobsPer1000);
+    console.log("jobs total: "+ filteredDict[0].totalJobs);
 
+    str += "Jobs per 1000: " + filteredDict[0].jobsPer1000 + "<br>";
+    str += "Number of Jobs: "+ filteredDict[0].totalJobs;
+
+
+
+    return str;
+}
+
+
+//make pop-up table that lists the top-ten jobs (or the only jobs listed), based on number of jobs
+//for the hovered-over state and the selected major job field
+ByState.prototype.popUpTable = function(){
+
+    var vis = this;
+
+    //get only data for hovered-over state and selected job field
+    var filteredArray = vis.jobTitlesDict.filter(function(item) {
+        return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
     });
 
-   //return str;
-    return vis.hoveredState;
+    //sort jobs descending by number of workers
+    filteredArray.sort(function (a, b){
+        return b.numJobs - a.numJobs;
+    });
+
+    //get only the jobs with top ten (at most) most employees
+    var dataToPrint = [];
+    for (var i = 0; i < filteredArray.length; i++){
+        dataToPrint[i] = filteredArray[i].jobTitle + ": "+ filteredArray[i].numJobs;
+
+        if (i == 9){
+            break;
+        }
+    }
+
+
+    //Add title to table
+    vis.svgTable.select("text.map-table-title").remove();
+
+    vis.svgTable.append("text")
+        .attr("class", "map-table-title")
+        .attr("x", 5) //x-axis for left edge of text
+        .attr("y", 50)
+        .attr("dy", ".1em")
+        .attr("text-anchor", "start")
+        .text(function(){
+            return vis.hoveredState + " \nTop " +
+                vis.selectedField + " Jobs";
+        });
+
+    //make table with top ten jobs in the selected major job field in this state
+    vis.mapTable = vis.svgTable.selectAll("text.map-table")
+        .data(dataToPrint);
+
+    vis.mapTable.enter()
+        .append("text")
+        .attr("class", "map-table")
+        .attr("x", 5)                              //x-axis for left edge of text
+
+    vis.mapTable.attr("y", function(d, index){    //y-axis for baseline of text
+            return 100 + (index * 20);
+        })
+        .attr("text-anchor", "start")
+        .text(function(d){
+            return d;
+        });
+
+    vis.mapTable.exit().remove();
+
 }
 
 
@@ -302,6 +431,7 @@ ByState.prototype.makeLegend = function(){
         .labelAlign("start")
         .shapeWidth("75")
         .title(vis.selectedField + " Jobs per 1000 Jobs in Each State in 2015");
+        //.title("Percent of State Jobs in "+ vis.selectedField + " in 2015");
 
     vis.svg.select(".legendQuant")
         .call(vis.legend);
@@ -319,6 +449,25 @@ ByState.prototype.makeLegend = function(){
  */
 ByState.prototype.addSelectionToMapData = function(){
     var vis = this;
+
+
+    /*PERCENT JOBS
+    vis.percentJobs.forEach(function(item){
+        if (item.jobField.indexOf(vis.selection) > -1){             //if job field matches selection
+            for (var j = 0; j < vis.USA.length; j++){               //for all map data,
+
+                var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
+
+                if (mapState == item.state){                      //if state on map matches,
+
+                    vis.USA[j].properties[vis.selection] = item.percent;//add jobs data to map data
+                    break;
+                }
+            }
+        }
+
+    });*/
+
 
     //Match state to map data and match job field to selection
     vis.jobFieldDict.forEach(function(item){
@@ -339,6 +488,8 @@ ByState.prototype.addSelectionToMapData = function(){
         }
 
     });
+
+
 
 
 }
