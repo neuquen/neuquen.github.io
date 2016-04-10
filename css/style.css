@@ -38,3 +38,26 @@
 div.tooltip {
     pointer-events: none;
 }
+
+/*********************/
+/*     BAR CHART     */
+/*********************/
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.bars {
+    fill: lightblue;
+}
+
+.percentage {
+    text-anchor:middle;
+}
