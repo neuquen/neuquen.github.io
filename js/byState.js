@@ -343,13 +343,8 @@ ByState.prototype.hoverStateData = function(){
         return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
     })
 
-    console.log("jobs per 1000: "+ filteredDict[0].jobsPer1000);
-    console.log("jobs total: "+ filteredDict[0].totalJobs);
-
     str += "Jobs per 1000: " + filteredDict[0].jobsPer1000 + "<br>";
     str += "Number of Jobs: "+ filteredDict[0].totalJobs;
-
-
 
     return str;
 }
