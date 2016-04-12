@@ -36,7 +36,6 @@ RobotUnitsSold = function(_parentElement, _data){
 
     // DEBUG RAW DATA
     console.log(this.data);
-    this.dataCopy = this.data.slice(0); // copy data
 
     this.initVis();
 }
