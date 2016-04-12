@@ -52,6 +52,7 @@ div.tooltip {
 .axis text {
     font-family: sans-serif;
     font-size: 11px;
+    fill: #333;
 }
 
 .bars {
@@ -60,4 +61,30 @@ div.tooltip {
 
 .percentage {
     text-anchor:middle;
+}
+
+/**********************/
+/*     UNITS SOLD     */
+/**********************/
+#robot-units-sold {
+    fill: #CCD1D1;
+}
+
+
+.title{
+    fill: #333;
+    font-size: 32px;
+    text-decoration:bold;
+    text-decoration:underline;
+}
+
+.axis-label{
+    fill: #333;
+    font-size: 20px;
+    text-decoration:bold;
+}
+
+.data-source{
+    fill: #333;
+    font-size: 12px;
 }

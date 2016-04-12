@@ -215,7 +215,7 @@ ByState.prototype.initPopUpTable = function(){
     var vis = this;
     vis.marginTable = { top: 40, right: 0, bottom: 60, left: 60 };
 
-    //width was at 1000
+
     vis.widthTable = 400 - vis.marginTable.left - vis.marginTable.right,
         vis.heightTable = 600 - vis.marginTable.top - vis.marginTable.bottom;
 

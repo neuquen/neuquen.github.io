@@ -1,4 +1,9 @@
 /*
+ * source for interactive tool (provided in class for HW4):
+ * http://www.d3noob.org/2014/07/my-favourite-tooltip-method-for-line.html
+*/
+
+/*
  * Load the data
  */
 loadData();
@@ -7,17 +12,11 @@ function loadData() {
         if (error) throw error;
 
         //Process and clean the data
-        //csv.forEach(function(d){
-        //    // Convert string to 'date object'
-        //    d.YEAR = formatDate.parse(d.YEAR);
-        //
-        //    // Convert numeric values to 'numbers'
-        //    d.TEAMS = +d.TEAMS;
-        //    d.MATCHES = +d.MATCHES;
-        //    d.GOALS = +d.GOALS;
-        //    d.AVERAGE_GOALS = +d.AVERAGE_GOALS;
-        //    d.AVERAGE_ATTENDANCE = +d.AVERAGE_ATTENDANCE;
-        //});
+        csv.forEach(function(d){
+            //Convert string to 'date object'
+            d.Year = d3.time.format("%Y").parse(d.Year);
+            d.Units = +d.Units;
+        });
 
         // Draw the visualization for the first time
         new RobotUnitsSold("robot-units-sold", csv);
@@ -37,6 +36,7 @@ RobotUnitsSold = function(_parentElement, _data){
 
     // DEBUG RAW DATA
     console.log(this.data);
+    this.dataCopy = this.data.slice(0); // copy data
 
     this.initVis();
 }
@@ -50,10 +50,10 @@ RobotUnitsSold = function(_parentElement, _data){
 RobotUnitsSold.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 60, left: 60 };
+    vis.margin = { top: 100, right: 75, bottom: 90, left: 100 };
 
-    vis.width = 800 - vis.margin.left - vis.margin.right,
-        vis.height = 400 - vis.margin.top - vis.margin.bottom;
+    vis.width = 700 - vis.margin.left - vis.margin.right,
+        vis.height = 550 - vis.margin.top - vis.margin.bottom;
 
     // SVG drawing area
     vis.svg = d3.select("#" + vis.parentElement).append("svg")
@@ -62,76 +62,120 @@ RobotUnitsSold.prototype.initVis = function(){
         .append("g")
         .attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
 
-    // Scales and axes
-    vis.x = d3.time.scale()
-        .range([0, vis.width])
-        .domain(d3.extent(vis.data, function(d) { return d.Year; }));
+    vis.radius = 5;
 
-    vis.y = d3.scale.linear()
-        .range([vis.height, 0]);
+    // Define scales
+    vis.x = d3.time.scale().range([0,vis.width]);
+    vis.y = d3.scale.linear().range([vis.height,0]);
 
+    // Define domains
+    vis.x.domain(d3.extent(vis.data, function(d){return d.Year;})); //add domains
+    vis.y.domain([0, d3.max(vis.data, function(d) { return d.Units;})]);
+
+    //set axis
     vis.xAxis = d3.svg.axis()
         .scale(vis.x)
-        .orient("bottom");
+        .orient("bottom")
+        .ticks(d3.time.year, 1)
+        .tickFormat(d3.time.format(("%Y")));
 
-    vis.yAxis = d3.svg.axis()
-        .scale(vis.y)
-        .orient("left");
+    vis.yAxis  = d3.svg.axis().scale(vis.y).orient("left");
 
-    vis.svg.append("g")
-        .attr("class", "x-axis axis")
-        .attr("transform", "translate(0," + vis.height + ")");
+    //Append axis
+    vis.svg.append("g").attr("class", "axis x-axis")
+        .attr("transform", "translate(0," + vis.height + ")")
+        .call(vis.xAxis);
 
-    vis.svg.append("g")
-        .attr("class", "y-axis axis");
+    vis.svg.append("g").attr("class", "axis y-axis").call(vis.yAxis);
 
-    // Initialize layout
+    //add title
+    vis.svg.append("text")
+        .attr("class", "title")
+        .attr("x", 75)   //position relative to top corner
+        .attr("y", -20)
+        .text("Worldwide Robotics Sales");
 
+    //add y-axis label
+    vis.svg.append("text")
+        .attr("class", "axis-label")
+        .style("text-anchor", "end")
+        .attr("x", -60)
+        .attr("y", -70)
+        .attr("dy", ".1em")
+        .attr("transform", "rotate(-90)")  //rotate x-axis labels
+        .text("Robotics Units Sold Worldwide");
 
+    //add data source
+    vis.svg.append("text")
+        .attr("class", "data-source")
+        .attr("x", vis.marginLeft)
+        .attr("y", vis.height + 60)
+        .text("Source: International Federation of Robotics, World Robot 2015 Industrial Robot Statistics");
 
-    vis.wrangleData();
+    vis.svg.append("text")
+        .attr("class", "data-source")
+        .attr("x", vis.marginLeft)
+        .attr("y", vis.height + 80)
+        .text("http://www.ifr.org/industrial-robots/statistics/");
+
+    vis.makeVis();
 }
 
 
-
 /*
- * Data wrangling - Filter, aggregate, modify data
+ * Draw the areachart and circles. Add the tooltips.
  */
-
-RobotUnitsSold.prototype.wrangleData = function(){
+RobotUnitsSold.prototype.makeVis = function(){
     var vis = this;
 
-    // Filter, aggregate or modify the data
+    var formatDate = d3.time.format("%Y");
+    var addComma = d3.format("0,000");
 
+    //init tooltip
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .html(function(d){
+            return formatDate(d.Year) + "<br> " + addComma(d.Units) + " units";
+        })
+        .offset([-vis.radius, 0]);
 
-    vis.displayData = vis.filteredData;
+    vis.svg.call(tip);
 
-    // Update the visualization
-    vis.updateVis();
-}
+    //draw area chart
+    vis.area = d3.svg.area()
+        .x(function (d) {
+            return vis.x(d.Year);
+        })
+        .y1(function (d) {
+            return vis.y(d.Units);
+        })
+        .y0(vis.height);  //baseline
 
+    vis.path = vis.svg.append("path")
+        .datum(vis.data)
+        .attr("class", "area")
+        .attr("d", vis.area);
 
+    //make circles
+    vis.circle = vis.svg.selectAll("circle")
+        .data(vis.data);
 
-/*
- * The drawing function - should use the D3 update sequence (enter, update, exit)
- * Function parameters only needed if different kinds of updates are needed
- */
+    vis.circle.enter()
+        .append("circle")
+        .attr("class", "graphCircles")
+        .attr("r", vis.radius)
+        .attr("fill", "black")
+        .attr("stroke", "black");
 
-RobotUnitsSold.prototype.updateVis = function(){
-    var vis = this;
+    vis.circle
+        .attr("cx", function(d){
+            return vis.x(d.Year);
+        })
+        .attr("cy", function(d){
+            return vis.y(d.Units)
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
-    // Update domain
-
-
-    // Data Join
-
-
-    // Enter/Update/Exit
-
-
-
-    // Call axis functions with the new domain
-    vis.svg.select(".x-axis").call(vis.xAxis);
-    vis.svg.select(".y-axis").call(vis.yAxis);
 }
 
