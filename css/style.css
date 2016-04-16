@@ -63,6 +63,31 @@ div.tooltip {
     text-anchor:middle;
 }
 
+#future-of-employment{
+    /*width:925px;*/
+    /*height:100%;*/
+    /*overflow: scroll;*/
+    /*overflow-x: hidden;*/
+}
+
+svg .labels, svg .probability {
+    text-anchor: end;
+    alignment-baseline:middle;
+}
+
+#sort-none {
+    display:none;
+}
+
+/* See: https://css-tricks.com/hover-on-everything-but/ */
+g:hover > g.group {
+    opacity: .3;
+}
+
+g:hover > g.group:hover {
+    opacity: 1.0;
+}
+
 /**********************/
 /*     UNITS SOLD     */
 /**********************/
