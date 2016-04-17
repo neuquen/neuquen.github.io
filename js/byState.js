@@ -242,9 +242,6 @@ ByState.prototype.wrangleData = function(){
     }
     else if (vis.dataTypeSelected == "Likely") {
 
-
-
-
         var count = 0;
         for (var h = 0; h < vis.jobFieldDictLikely.length; h++) {
             console.log("state: " + vis.jobFieldDictLikely[h].state + ", field: " +
@@ -361,8 +358,6 @@ ByState.prototype.makeLikelyDictionaries = function() {
                         numJobsWithoutComputerization: vis.jobTitlesDict[k].numJobs,
                         numJobs: 0
                     });
-
-                    console.log("Made a dict entry where num jobs was ZERO");
                 }
                 else {  //if prob of computerized is < 0.5, num jobs stays the same
                     vis.jobTitlesDictLikely.push({
@@ -534,7 +529,7 @@ ByState.prototype.popUpTable = function(){
     });
 
     //title of table
-    var dataToPrint = "<h2>" + vis.hoveredState +": "+ vis.selectedField + " Jobs Most Likely to Be Computerized </h2><table>";
+    var dataToPrint = "<span class=\"map-table-title\">" + vis.hoveredState +": "+ vis.selectedField + " Jobs Most Likely to Be Computerized </span><table>";
     //column headers
     dataToPrint += "<tr><td>Job Title</td><td>Jobs in 2015</td><td>Prob. of Computerization</td></tr>";
 
@@ -562,10 +557,10 @@ ByState.prototype.makeLegend = function(){
         vis.legendTitle = ": Jobs per 1000 Jobs in Each State in 2015";
     }
     else if (vis.dataTypeSelected == "TotalJobs"){
-        vis.legendTitle = ": Jobs in Each State in 2015"
+        vis.legendTitle = " Jobs in Each State in 2015 - in Thousands"
     }
     else if (vis.dataTypeSelected == "Likely"){
-        vis.legendTitle = ": Jobs per 1000 in 2015 - Without Jobs 0.5 or More Likely to Be Computerized"
+        vis.legendTitle = ": Jobs per 1000 in 2015 - Without Jobs Likely Computerized"
     }
 
     vis.selectedJobField();
@@ -575,7 +570,7 @@ ByState.prototype.makeLegend = function(){
         .scale(vis.color)
         .orient("horizontal")
         .labelAlign("start")
-        .shapeWidth("80")
+        .shapeWidth("70")
         .title(vis.selectedField + vis.legendTitle);
         //.title("Percent of State Jobs in "+ vis.selectedField + " in 2015");
 
