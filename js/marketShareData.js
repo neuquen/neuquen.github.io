@@ -256,13 +256,17 @@ MarketShareData.prototype.makeVis = function(){
     var addComma = d3.format("0,000");
 
     //init tooltip
+    //source for changing opacity: http://stackoverflow.com/questions/30066259/
+    //        d3-js-changing-opacity-of-element-on-mouseover-if-condition-false
     var tip = d3.tip()
         .attr('class', 'd3-tip')
         .html(function(d){
-            if ($.objDragged === d.sector){
-                return "CORRECT!";
+
+            d3.select(this).style("opacity",.3);
+            if (d.sector.indexOf($.objDragged) > -1){ //$.objDragged === d.sector
+                return "CORRECT! <br> Industry detail to come.";
             }
-            return ("WRONG:" + d.sector);
+            return ("Wrong. Try again.");
             //return d.marketShare + " billion";
         });
 
@@ -298,26 +302,61 @@ MarketShareData.prototype.makeVis = function(){
             return vis.y(d.marketShare)
         })
         .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+
+        .on('mouseout', function(d){
+            tip.hide(d);
+            d3.select(this).style("opacity", 1);
+        });
+
+
+
+
 
 
     //jQuery droppable ui: http://jqueryui.com/droppable/
     $(function() {
         $( "#Finance" ).draggable({
+            //stack will make draggable appear OVER the circle
             drag: function(event, ui){
                 $.objDragged = "Finance";
-                console.log("objdragged: "+ $.objDragged);
-            }
-
-        });
-        $( "#market-share-plot" ).droppable({
-            drop: function( event, ui ) {
-              /*  $( this )
-                    .addClass( "ui-state-highlight" )
-                    .find( "p" )
-                    .html( "Dropped!" );*/
             }
         });
+        $( "#Service" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Service";
+            }
+        });
+        $( "#Industrial" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Industrial";
+            }
+        });
+        $( "#Healthcare" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Healthcare";
+            }
+        });
+        $( "#AI" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Artificial";
+            }
+        });
+        $( "#Aerospace" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Aerospace";
+            }
+        });
+        $( "#Autos").draggable({
+            drag: function(event, ui){
+                $.objDragged = "Autos";
+            }
+        });
+        $( "#Agriculture").draggable({
+            drag: function(event, ui){
+                $.objDragged = "Agriculture";
+            }
+        });
+       $( "#market-share-plot" ).droppable({});
     });
 
 }
@@ -325,17 +364,4 @@ MarketShareData.prototype.makeVis = function(){
 
 
 
-/**
- * If mouse moves over node, gets default inline display.
- */
-MarketShareData.prototype.mouseover = function() {
-    div.style("display", null);
-}
-
-/**
- * If mouse leaves node, hides display.
- */
-MarketShareData.prototype.mouseout = function() {
-    div.style("display", "none");
-}
 

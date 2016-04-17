@@ -106,7 +106,7 @@ g:hover > g.group:hover {
 .axis-label{
     fill: #333;
     font-size: 20px;
-    font-weight:bold;
+    /*font-weight:bold;*/
 }
 
 .data-source{
@@ -134,6 +134,15 @@ th, td {
     text-align: left;
 }
 
+
+h1 {
+    text-align:center;
+    font-size: 40px;
+    font-weight:bold;
+    padding:10px 1px 20px 1px;  /*top right bottom left padding */
+}
+
+
 /* header for selected building data */
 h2 {
     font-size: 18px;
@@ -148,22 +157,56 @@ h2 {
 /*    MARKET SHARE    */
 /**********************/
 
-.col1, .col3 {
-    background-color: lightgray;
-}
+
 
 .draggable {
     width: 75px;
-    height: 25px;
-    padding: 0.5em;
+    height: 20px;
+    padding-left: 0.5em;
 }
 
 .svgList {
     overflow: visible;
 }
 
-.drag-instructions{
-    font-size: 18px;
+
+
+.marketShareCircles{
+    stroke-width: 2px;
+    stroke: black;
+}
+
+
+/* center bootstrap grid columns*/
+.centergrid {
+    text-align:center;
+    vertical-align: middle;
+}
+
+
+.draggable {
+    width: 150px;
+    height: 25px;
+    padding-left: 0.5em;
+    /* resource for centering grid columns:
+       http://www.minimit.com/articles/solutions-tutorials/bootstrap-3-responsive-centered-columns */
+   text-align: left;
+    float:none;
+    vertical-align:middle;
+    margin:20px;
+}
+
+#market-list-subtitle{
+    width: 400px;
+    height: 30px;
+    text-align:center;
+    font-size: 20px;
     font-weight:bold;
-    text-decoration:underline;
+    /*margin:10px;*/
+    padding:50px 1px 40px 1px;  /*top right bottom left padding */
+}
+
+#market-share-text{
+    padding:0px 1px 40px 1px;  /*top right bottom left padding */
+}
 }
