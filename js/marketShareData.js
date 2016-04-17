@@ -1,5 +1,7 @@
 /*
  * Load the data
+ *
+ *
  */
 loadData();
 function loadData() {
@@ -9,7 +11,7 @@ function loadData() {
         //Process and clean the data
         csv.forEach(function(d){
             //Convert string to 'date object'
-            d.year = +d.year; //d3.time.format("%Y").parse(d.year);
+            d.year = d3.time.format("%Y").parse(d.year);
             d.marketShare = +d.marketShare;
         });
 
@@ -18,12 +20,8 @@ function loadData() {
             return a.year- b.year;
         });
 
-
-
-
-
         // Draw the visualization for the first time
-        new MarketShareData("market-share-data", csv);
+        new MarketShareData("market-share-plot", csv);
     });
 }
 
@@ -33,73 +31,120 @@ function loadData() {
  * @param _data				-- the marketShareData.csv data
  */
 
-MarketShareData = function(_parentElement, _csv){
+MarketShareData = function(_parentElement,  _csv){
     this.parentElement = _parentElement;
-    this.csv = _csv;
+    this.data = _csv;
     this.displayData = []; // see data wrangling
 
     // DEBUG RAW DATA
-    console.log(this.csv);
+    console.log(this.data);
 
-    this.initVis();
+    this.initVisPlot();
+    //this.initVisList();
+    //this.makeDraggableList();
 }
 
 
 
+
+//drag and drop sources: http://jsfiddle.net/6vojozy1/
+//                      https://gist.github.com/mbostock/6123708
+//
+MarketShareData.prototype.makeDraggableList = function(){
+
+    var vis = this;
+
+    var drag = d3.behavior.drag()
+        .origin(function(d) {
+            return d;
+        })
+        .on("dragstart", dragstarted)
+        .on("drag", dragged)
+        .on("dragend", dragended);
+
+
+    //make g element
+    vis.rectGroup = vis.svg.append("g")
+       .data(vis.data);
+
+
+    //add rect to g element
+    vis.rect = vis.rectGroup.selectAll("rect")
+        .data(vis.data)
+        .enter()
+        .append("rect")
+        .attr("fill", "none")
+        .attr("width", 210)  //long
+        .attr("height", 30) //thick
+        .attr("x", -400)
+        .attr("y", function(d,index){
+            return 75 + (50*index);
+        })
+        .call(drag);
+
+
+    //add text to g element
+    vis.rectText = vis.rectGroup.selectAll("text")
+        .data(vis.data)
+        .enter()
+        .append("text", "marketshareList")
+        .attr("x", -390)
+        .attr("y", function(d,index){
+            return 92 + (50*index);
+        })
+        .text(function(d) {
+            if (d.sector == "AI"){
+                return "Artificial Intelligence";
+            }
+            if (d.sector.indexOf("bots")>-1){
+                return "Service (care-bots, education)";
+            }
+            return d.sector;
+        })
+        .call(drag);
+
+
+    //add title
+    vis.svg.append("text")
+        .attr("class", "drag-instructions")
+        .attr("x", -400)   //position relative to top corner
+        .attr("y", 0)
+        .text("Drag a sector to the correct circle.");
+
+
+
+    function dragstarted(d) {
+        //d3.event.sourceEvent.stopPropagation();
+        d3.select(this).classed("dragging", true);
+    }
+
+    function dragged(d) {
+        d3.select(this)
+            .attr("x", d.x = event.x)
+            .attr("y", d.y = event.y);
+
+    }
+
+    function dragended(d) {
+        console.log("event.x: "+event.x + ", this.getAttributex: "+ this.getAttribute("x"));
+        console.log("d.text: "+ d3.event.text);
+        d3.select(this).classed("dragging", false);
+    }
+
+
+}
+
 /*
  * Initialize visualization (static content, e.g. SVG area or axes)
  */
-
-MarketShareData.prototype.initVis = function(){
+MarketShareData.prototype.initVisPlot = function(){
     var vis = this;
+    //vis.objDragged = "";
 
+    vis.margin = { top: 100, right: 50, bottom: 100, left: 400 };
 
-    vis.margin = { top: 50, right: 10, bottom: 50, left: 10 };
-
-    vis.width = 800 - vis.margin.left - vis.margin.right,
-        vis.height = 800 - vis.margin.top - vis.margin.bottom;
-
-    vis.data = [];   //major job field data (eg, Education)
-    vis.originx = vis.width/2;
-    vis.originy = vis.height/2;
-    var radiusBigCircle = 250;
-
-    //make dict
-    for (var i = 0; i < this.csv.length; i++) {
-
-        if (this.csv[i].year == "2018") {
-            vis.data.push({
-                year: this.csv[i].year,
-                marketShare: this.csv[i].marketShare,
-                sector: this.csv[i].sector,
-                yearGroup: 0,
-                x: vis.originx + radiusBigCircle * Math.cos(2 * Math.PI * (i/this.csv.length) + 200),
-                y: vis.originy + radiusBigCircle * Math.sin(-2 * Math.PI * (i/this.csv.length)+ 200),
-            });
-        }
-        else if (this.csv[i].year == "2020")
-        {
-            vis.data.push({
-                year: this.csv[i].year,
-                marketShare: this.csv[i].marketShare,
-                sector: this.csv[i].sector,
-                yearGroup: 1,
-                x: vis.originx + radiusBigCircle * Math.cos(2 * Math.PI * (i/this.csv.length)+ 200),
-                y: vis.originy + radiusBigCircle * Math.sin(2 * Math.PI * (i/this.csv.length)+ 200),
-            });
-        }
-        else if (this.csv[i].year == "2025")
-        {
-            vis.data.push({
-                year: this.csv[i].year,
-                marketShare: this.csv[i].marketShare,
-                sector: this.csv[i].sector,
-                yearGroup: 2,
-                x: vis.originx + radiusBigCircle * Math.cos(2 * Math.PI * (i/this.csv.length)+ 200),
-                y: vis.originy + radiusBigCircle * Math.sin(2 * Math.PI * (i/this.csv.length)+ 200),
-            });
-        }
-    }
+    vis.width = 1000 - vis.margin.left - vis.margin.right,
+        vis.height = 700 - vis.margin.top - vis.margin.bottom;
 
 
     // SVG drawing area
@@ -109,33 +154,75 @@ MarketShareData.prototype.initVis = function(){
         .append("g")
         .attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
 
+    //vis.radius = 5;
+
+    // Define scales
+    vis.x = d3.time.scale().range([0,vis.width]);
+    vis.y = d3.scale.linear().range([vis.height,0]);
+
+    // Define domains
+
+    var minYr = new Date("2015");
+    var maxYr = new Date("2027");
+    vis.x.domain([minYr, maxYr]);//d3.extent(vis.data, function(d){return d.year;}));
+    vis.y.domain([0, 300]);//[0, d3.max(vis.data, function(d) { return d.marketShare;})]);
+    //vis.y.domain(d3.extent(vis.data, function(d){return d.marketShare;}));
+
+    //set axis
+    vis.xAxis = d3.svg.axis()
+        .scale(vis.x)
+        .orient("bottom")
+        .ticks(d3.time.year, 5)
+        .tickFormat(d3.time.format(("%Y")));
+
+    vis.yAxis  = d3.svg.axis()
+        .scale(vis.y)
+        .orient("left")
+        .ticks(4);
+
+    //Append axis
+    vis.svg.append("g").attr("class", "axis x-axis")
+        .attr("transform", "translate(0," + vis.height + ")")
+        .call(vis.xAxis);
+
+    vis.svg.append("g").attr("class", "axis y-axis").call(vis.yAxis);
+
 
     //add title
     vis.svg.append("text")
         .attr("class", "title")
-        .attr("x", vis.width/5)   //position relative to top corner
-        .attr("y", -10)
-        .text("Projected Robotics Marketshare");
+        .attr("x", 30)   //position relative to top corner
+        .attr("y", -50)
+        .text("Forcasted Robotics Marketsize in US");
 
-    /*
+    //add y-axis label
+    vis.svg.append("text")
+        .attr("class", "axis-label")
+        .style("text-anchor", "end")
+        .attr("x", -180)
+        .attr("y", -60)
+        .attr("dy", ".1em")
+        .attr("transform", "rotate(-90)")  //rotate x-axis labels
+        .text("Marketsize in USD Billions");
+
+
     //add data source
+
     vis.svg.append("text")
         .attr("class", "data-source")
-        .attr("x", vis.marginLeft)
+        .attr("x", 0)
         .attr("y", vis.height + 60)
-        .text("Source: International Federation of Robotics, World Robot 2015 Industrial Robot Statistics");
+        .text("Source: Robot Revolution - Global Robot & AI Primer, Bank of America Merrill Lynch");
 
     vis.svg.append("text")
         .attr("class", "data-source")
-        .attr("x", vis.marginLeft)
+        .attr("x", 0)
         .attr("y", vis.height + 80)
-        .text("http://www.ifr.org/industrial-robots/statistics/");
-*/
-    // Initialize layout
+        .text("http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf");
 
 
-
-    vis.wrangleData();
+    vis.makeVis();
+    //vis.wrangleData();
 }
 
 
@@ -153,25 +240,35 @@ MarketShareData.prototype.wrangleData = function(){
     vis.displayData = vis.filteredData;
 
     // Update the visualization
-    //vis.updateVis();
-    vis.makeArc2();
+    vis.updateVis();
 }
 
-MarketShareData.prototype.makeArc2 = function(){
+/*
+ * Draw the areachart and circles. Add the tooltips.
+ */
+MarketShareData.prototype.makeVis = function(){
     var vis = this;
 
-    //INIT TOOLTIP
+    // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js - Set2, number 8
+    vis.color = ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"];
+
+    var formatDate = d3.time.format("%Y");
+    var addComma = d3.format("0,000");
+
+    //init tooltip
     var tip = d3.tip()
         .attr('class', 'd3-tip')
         .html(function(d){
-            return d.marketShare + " billion"; //get country data for tooltip
+            if ($.objDragged === d.sector){
+                return "CORRECT!";
+            }
+            return ("WRONG:" + d.sector);
+            //return d.marketShare + " billion";
         });
 
     vis.svg.call(tip);
 
-
-    vis.smallCircleRadius = 4;
-
+    vis.smallCircleRadius = 3;
 
     //make circles
     vis.circle = vis.svg.selectAll("circle")
@@ -181,56 +278,47 @@ MarketShareData.prototype.makeArc2 = function(){
         .append("circle")
         .attr("class", "marketShareCircles")
         .attr("r", function(d){
-            return d.marketShare/vis.smallCircleRadius;
+            return (d.marketShare)/vis.smallCircleRadius;
         })
-        .attr("fill", "grey")
-        .attr("stroke", "grey");
+        .attr("fill", function(d, index){
+            console.log("color: "+ vis.color[index]);
+            return vis.color[index];
+        })
+        .attr("stroke", function(d, index){
+            return vis.color[index];
+        });
+
+
 
     vis.circle
-        .attr("cx", function(d, index){
-            return d.x;
+        .attr("cx", function(d){
+            return vis.x(d.year);
         })
-        //.attr("cy", 50);
         .attr("cy", function(d, index){
-            return d.y;
+            return vis.y(d.marketShare)
         })
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
-        /*
-        .on("mousemove", function(d){
-            vis.svg.append("text")
-                .attr("class", "marketsharetable")
-                .attr("x", function(){
-                    return vis.originx;
-                })   //position relative to top corner
-                .attr("y", function(){
-                    return vis.originy;
-                })
-                .text(d.marketShare);
-        })
-        .on("mouseover", function () {
-            marketsharetable.style("display", null);
-        })										//'null' display gets default inline display
-        .on("mouseout", function () {
-            marketsharetable.style("display", "none");
-        });*/
 
+    //jQuery droppable ui: http://jqueryui.com/droppable/
+    $(function() {
+        $( "#Finance" ).draggable({
+            drag: function(event, ui){
+                $.objDragged = "Finance";
+                console.log("objdragged: "+ $.objDragged);
+            }
 
-    var text = vis.svg.append("g")
-        .attr("class", "labels")
-        .selectAll("text")
-        .data(vis.data)
-        .enter().append("text")
-        .style("text-anchor", "start")
-        .attr("x", function(d,index){
-            return d.x - 50;
-        })
-        .attr("y", function(d){return d.y - d.marketShare/vis.smallCircleRadius - 10; })
-        .attr("dy", ".35em")
-        .text(function(d) { return d.year + ": " + d.sector; });
-
-
+        });
+        $( "#market-share-plot" ).droppable({
+            drop: function( event, ui ) {
+              /*  $( this )
+                    .addClass( "ui-state-highlight" )
+                    .find( "p" )
+                    .html( "Dropped!" );*/
+            }
+        });
+    });
 
 }
 
@@ -249,85 +337,5 @@ MarketShareData.prototype.mouseover = function() {
  */
 MarketShareData.prototype.mouseout = function() {
     div.style("display", "none");
-}
-
-MarketShareData.prototype.makeTable = function() {
-    var vis = this;
-
-    vis.svg.append("text")
-        .attr("class", "marketshare-table")
-        .attr("x", vis.originx - 20)   //position relative to top corner
-        .attr("y", vis.originy - 20)
-        .text(vis.hoveredDatum.marketShare);
-}
-
-
-MarketShareData.prototype.makeArc = function(){
-    var vis = this;
-
-    var arc = d3.svg.arc()
-        .innerRadius(100)
-        .outerRadius(150)
-        .startAngle(145 * (Math.PI/180)) //converting from degs to radians
-        .endAngle(3) //just radians
-
-    vis.svg.attr("width", "400").attr("height", "400") // Added height and width so arc is visible
-        .append("path")
-        .attr("d", arc)
-        .attr("fill", "red")
-        .attr("transform", "translate(200,200)");
-}
-
-
-/*
- * The drawing function - should use the D3 update sequence (enter, update, exit)
- * Function parameters only needed if different kinds of updates are needed
- */
-
-MarketShareData.prototype.updateVis = function(){
-    var vis = this;
-
-    //make circles
-    vis.circle = vis.svg.selectAll("circle")
-        .data(vis.data);
-
-    vis.circle.enter()
-        .append("circle")
-        .attr("class", "marketShareCircles")
-        .attr("r", function(d){
-            return d.marketShare/5;
-        })
-        .attr("fill", "grey")
-        .attr("stroke", "grey");
-
-    vis.circle
-        .attr("cx", function(d, index){
-            return 10 + (index*75) + (50*d.yearGroup);
-        })
-        //.attr("cy", 50);
-        .attr("cy", function(d){
-            console.log("d.yearGroup is "+ d.yearGroup);
-            return vis.height -  (200 + (200*d.yearGroup));
-        });
-
-
-
-
-
-    var text = vis.svg.append("g")
-        .attr("class", "labels")
-        .selectAll("text")
-        .data(vis.data)
-        .enter().append("text")
-        .style("text-anchor", "start")
-        .attr("x", function(d,index){
-            return (index*75) + (50*d.yearGroup);
-        })
-        .attr("y", function(d){return vis.height -  (125 + (200*d.yearGroup)); })
-        .attr("dy", ".35em")
-        .text(function(d) { return d.sector; });
-
-
-
 }
 

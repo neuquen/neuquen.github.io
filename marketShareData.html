@@ -8,6 +8,9 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
 </head>
 <body>
 
@@ -16,10 +19,67 @@
 <div class="container">
 
     <!-- Visualization Placeholder -->
-    <div id="market-share-data"></div>
 
-</div>
 
+    <div class = "row">
+       <div class="col-md-3 col-lg-3 ui-widget-content market-share-list draggable" id="Finance" >
+            <p>Finance</p>
+
+        </div>
+
+        <div class="col-md-9 col-lg-9" id="market-share-plot"></div>
+    </div>
+
+<!--
+    <div class = "row">
+        <div class="col-md-12 col-lg-12" id="marketshareTitle"></div>
+    </div>
+
+
+    <div class = "row">
+        <div class="col-md-4 col-lg-4" id="emptycell"></div>
+        <div class="col-md-2 col-lg-2" id="cell2018"></div>
+        <div class="col-md-4 col-lg-4" id="cell2020"></div>
+        <div class="col-md-2 col-lg-2" id="cell2025"></div>
+    </div>
+
+
+    <div class = "row">
+        <div class="col-md-4 col-lg-4">
+            <div class = "row">
+                <div class="col-md-2 col-lg-2" id="cell0"></div>
+                <div class="col-md-2 col-lg-2" id="cell1"></div>
+            </div>
+            <div class = "row">
+                <div class="col-md-2 col-lg-2" id="cell6"></div>
+                <div class="col-md-2 col-lg-2" id="cell7"></div>
+            </div>
+        </div>
+        <div class="col-md-2 col-lg-2" id="cell2"></div>
+        <div class="col-md-2 col-lg-2" id="cell3"></div>
+        <div class="col-md-2 col-lg-2" id="cell4"></div>
+        <div class="col-md-2 col-lg-2" id="cell5"></div>
+    </div>
+
+
+    <div class ="row">
+        <div class="col-md-4 col-lg-4">
+            <div class = "row">
+                <div class="col-md-2 col-lg-2" id="cell8"></div>
+                <div class="col-md-2 col-lg-2" id="cell9"></div>
+            </div>
+            <div class = "row">
+                <div class="col-md-2 col-lg-2" id="cell13"></div>
+                <div class="col-md-2 col-lg-2" id="cell15"></div>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-lg-2" id="cell10"></div>
+        <div class="col-md-2 col-lg-2" id="cell11"></div>
+        <div class="col-md-2 col-lg-2" id="cell12"></div>
+        <div class="col-md-2 col-lg-2" id="cell13"></div>
+    </div>
+-->
 
 
 
@@ -32,9 +92,17 @@
 <!-- Latest minified D3JS -->
 <script src="js/d3.v3.min.js"></script>
 
+<!-- color brewer: Bike Bostock https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js -->
+<script src="js/colorbrewer.js"></script>
+
 <!-- Custom Scripts -->
 <script src="js/main.js"></script>
 <script src="js/marketShareData.js"></script>
 <script src="js/d3.tip.js"></script>
+
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
 </body>
 </html>

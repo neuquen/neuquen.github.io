@@ -74,17 +74,71 @@ div.tooltip {
 .title{
     fill: #333;
     font-size: 32px;
-    text-decoration:bold;
+    font-weight:bold;
     text-decoration:underline;
 }
 
 .axis-label{
     fill: #333;
     font-size: 20px;
-    text-decoration:bold;
+    font-weight:bold;
 }
 
 .data-source{
     fill: #333;
     font-size: 12px;
+}
+
+/**********************/
+/*     MAP            */
+/**********************/
+/* format table that contains building data stats */
+table{
+    border-collapse: collapse;
+
+}
+
+/* add table borders to area that shows data stats */
+td {
+    border-bottom: 1px solid #ABB2B9;
+}
+
+/* format table rows/cells that have selected building data */
+th, td {
+    padding: 4px;
+    text-align: left;
+}
+
+/* header for selected building data */
+h2 {
+    font-size: 18px;
+    text-align:left;
+}
+
+.tooltip-title{
+    text-decoration:underline;
+}
+
+/**********************/
+/*    MARKET SHARE    */
+/**********************/
+
+.col1, .col3 {
+    background-color: lightgray;
+}
+
+.draggable {
+    width: 75px;
+    height: 25px;
+    padding: 0.5em;
+}
+
+.svgList {
+    overflow: visible;
+}
+
+.drag-instructions{
+    font-size: 18px;
+    font-weight:bold;
+    text-decoration:underline;
 }

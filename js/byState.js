@@ -4,7 +4,7 @@ var mapData = [];
 
 
 /*
- * Load the data
+ * Makes the map.
  *
  * credits:
  *         us.json and us-state-names.tsv: Mike Bostock, at
@@ -19,12 +19,15 @@ var mapData = [];
  *         Mike Bostock's colorbrewer (revised from Cynthia Brewer's http://colorbrewer.org/)
  *         https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js
  *
+ *         remove commas from strings in order to convert to numbers:
+ *         http://stackoverflow.com/questions/7431833/convert-string-with-dot-or-comma-as-decimal-separator-to-number-in-javascript
+ *
  */
 loadData();
 function loadData() {
     var round = d3.format("d");
     var format = d3.format("," + round);
-    var twoDecimal = d3.format(".2f");
+    var fourDecimal = d3.format(".4f");
 
     var queue = d3_queue.queue();
 
@@ -32,7 +35,8 @@ function loadData() {
         .defer(d3.csv, "data/ByState2015.csv")
         .defer(d3.json, "data/us.json")
         .defer(d3.tsv, "data/us-state-names.tsv")
-        .await(function(error, csv, map, tsv){
+        .defer(d3.csv, "data/The-Future-of-Employment.csv")
+        .await(function(error, csv, map, tsv, probabilities){
             if (error) throw error;
 
             //Process and clean the data
@@ -41,7 +45,7 @@ function loadData() {
             csv.forEach(function(d){
                 d.TOT_EMP = format(+d.TOT_EMP.replace(/\D/g,''));
                 d.OCC_CODE = +d.OCC_CODE.replace(/\D/g,'');
-                d.JOBS_1000 = twoDecimal(+d.JOBS_1000);
+                d.JOBS_1000 = +(+d.JOBS_1000).toFixed(4);
             });
 
             this.stateNames = {};
@@ -49,9 +53,13 @@ function loadData() {
                 this.stateNames[d.id] = d.name;
             });
 
+            probabilities.forEach(function(d){
+                d.SOC_code = +d.SOC_code.replace(/\D/g,'');
+                d.Probability = +d.Probability;
+            })
 
             // Draw the visualization for the first time
-            new ByState("by-state", csv, map);
+            new ByState("by-state", csv, map, probabilities);
 
     });
 
@@ -66,10 +74,11 @@ function loadData() {
  * @param _mapData          -- USA json data, credit to Mike Bostock
  */
 
-ByState = function(_parentElement, _data, _mapData){
+ByState = function(_parentElement, _data, _mapData, _probabilities){
     this.parentElement = _parentElement;
     this.data = _data;
     this.mapData = _mapData;
+    this.probabilities = _probabilities;
     this.displayData = []; // see data wrangling
 
     // DEBUG RAW DATA
@@ -79,61 +88,11 @@ ByState = function(_parentElement, _data, _mapData){
     //convert from topojson to geojson
     this.USA = topojson.feature(this.mapData, this.mapData.objects.states).features
 
-    //console.log(this.USA);
-    this.jobFieldDict = [];   //major job field data (eg, Education)
-    this.jobTitlesDict = [];  //job title data (eg, Library Assistant)
-    this.totalJobsInState = []; //key = state, val = total num jobs in state
-    this.percentJobs = []; //key = state, val = major job field, percent of jobs in that field
-
-    //make dicts
-    for (var i = 0; i < this.data.length; i++) {
-
-        if (this.data[i].OCC_GROUP == "major"){
-            this.jobFieldDict.push({
-                state: this.data[i].STATE,
-                jobField: this.data[i].OCC_TITLE,    //major job field
-                jobsPer1000: this.data[i].JOBS_1000,  //jobs in this field per 1000 jobs in state
-                totalJobs: this.data[i].TOT_EMP,
-            });
-        }
-        else if (this.data[i].OCC_GROUP == "detailed"){
-
-            this.OCC_CODE = this.data[i].OCC_CODE;
-            this.getJobCategory();  //sets vis.jobCategory - for OCC_CODE, returns major job field
-
-            this.jobTitlesDict.push({
-                state: this.data[i].STATE,
-                jobField: this.jobCategory,
-                jobTitle: this.data[i].OCC_TITLE,
-                jobsPer1000: this.data[i].JOBS_1000,
-                numJobs: this.data[i].TOT_EMP
-            });
-        }
-        else if (this.data[i].OCC_GROUP == "total"){
-            this.totalJobsInState[this.data[i].STATE] = this.data[i].TOT_EMP;
-        }
-    }
-
-
-    //make dict that stores percent of jobs per state in a particular job field
-    //TODO - delete these parts? percentages don't work well b/c all too small
-    for (i=0; i < this.jobFieldDict.length; i++){
-
-        var state = this.jobFieldDict[i].state;
-        var allJobsInState = this.totalJobsInState[state];
-
-        this.percentJobs.push({
-            state: state,
-            jobField: this.jobFieldDict[i].jobField,
-            percent: parseFloat(this.jobFieldDict[i].totalJobs/allJobsInState).toFixed(2)
-        });
-    }
-
-
+    this.makeDictionaries();
+    this.makeLikelyDictionaries();
 
 
     this.initVis();
-
 }
 
 
@@ -149,7 +108,7 @@ ByState.prototype.initVis = function(){
 
     vis.margin = { top: 40, right: 0, bottom: 60, left: 60 };
 
-    //width was at 1000
+    //width was at 800
     vis.width = 800 - vis.margin.left - vis.margin.right,
         vis.height = 600 - vis.margin.top - vis.margin.bottom;
 
@@ -199,6 +158,7 @@ ByState.prototype.initVis = function(){
         .projection(vis.projection);
 
     vis.selection = "Management";  //default selection from drop-down
+    vis.dataTypeSelected = "Per1000";
 
     //get user selection from drop down menu
     $('#mapDropdown').change(function(){
@@ -206,7 +166,13 @@ ByState.prototype.initVis = function(){
         vis.wrangleData();
     });
 
-    vis.initPopUpTable();
+    //get user selection - raw data or factor in UK study probabilities of computerization
+    $('#dataTypeDropdown').change(function(){
+        vis.dataTypeSelected = $(this).val();
+        vis.wrangleData();
+    });
+
+    //vis.initPopUpTable();
     vis.wrangleData();
 }
 
@@ -237,42 +203,75 @@ ByState.prototype.initPopUpTable = function(){
 ByState.prototype.wrangleData = function(){
     var vis = this;
 
+    vis.round = d3.format("d");
+    vis.format = d3.format("," + this.round);
+
     //set color range
-    //TODO: pick different color range?
     // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js
     vis.color = d3.scale.quantize().range(colorbrewer.Blues[9]);
 
+    if (vis.dataTypeSelected == "Per1000") {
 
-    //make data array that has job data for each state, only for user-selected job
-    vis.selectionArray = vis.jobFieldDict.filter(function(item) {
-        return (item.jobField.indexOf(vis.selection) > -1);
-    });
 
-    vis.selectionArray.sort(function (a, b){
-        return a.jobsPer1000 - b.jobsPer1000;
-    });
+        //Filter for job category selected
+        vis.selectionArray = vis.jobFieldDict.filter(function (item) {
+            return (item.jobField.indexOf(vis.selection) > -1);
+        });
 
-    vis.min = vis.selectionArray[0].jobsPer1000;
-    vis.max = vis.selectionArray[vis.selectionArray.length - 1].jobsPer1000;
+        vis.selectionArray.sort(function (a, b) {
+            return a.jobsPer1000 - b.jobsPer1000;
+        });
+
+        vis.min = vis.selectionArray[0].jobsPer1000;
+        vis.max = vis.selectionArray[vis.selectionArray.length - 1].jobsPer1000;
+    }
+    else if (vis.dataTypeSelected == "TotalJobs") {
+
+        //Filter for job category selected
+        vis.selectionArray = vis.jobFieldDict.filter(function (item) {
+            return (item.jobField.indexOf(vis.selection) > -1);
+        });
+
+        vis.selectionArray.sort(function (a, b) {
+            return a.totalJobs - b.totalJobs;
+        });
+
+
+        vis.min = Math.round(vis.selectionArray[0].totalJobs/1000);
+        vis.max = Math.round(vis.selectionArray[vis.selectionArray.length - 1].totalJobs/1000);
+    }
+    else if (vis.dataTypeSelected == "Likely") {
+
+
+
+
+        var count = 0;
+        for (var h = 0; h < vis.jobFieldDictLikely.length; h++) {
+            console.log("state: " + vis.jobFieldDictLikely[h].state + ", field: " +
+                vis.jobFieldDictLikely[h].jobField + ", per1000: "+vis.jobFieldDictLikely[h].jobsPer1000);
+
+            if (count > 5) {
+                break;
+            }
+            count += 1;
+        }
+
+        //Filter for job category selected
+        vis.selectionArray = vis.jobFieldDictLikely.filter(function (item) {
+            return (item.jobField.indexOf(vis.selection) > -1 || vis.selection.indexOf(item.jobField) > -1);
+        });
+
+        vis.selectionArray.sort(function (a, b) {
+            return a.jobsPer1000 - b.jobsPer1000;
+        });
+
+        vis.min = vis.selectionArray[0].jobsPer1000;
+        vis.max = vis.selectionArray[vis.selectionArray.length - 1].jobsPer1000;
+    }
+
+    console.log("min: "+ vis.min + " max: "+ vis.max);
 
     vis.color.domain([vis.min, vis.max]);
-
-
-    /*
-     //PERCENT JOBS
-     vis.selectionArray = vis.percentJobs.filter(function(item) {
-     return (item.jobField.indexOf(vis.selection) > -1);
-     });
-
-     vis.selectionArray.sort(function (a, b){
-     return a.percent - b.percent;
-     });
-
-     vis.min = vis.selectionArray[0].percent;
-     vis.max = vis.selectionArray[vis.selectionArray.length - 1].percent;
-
-     vis.color.domain([vis.min, vis.max]);
-     */
 
     //add data re: drop-down selection to map data
     vis.addSelectionToMapData();
@@ -280,6 +279,166 @@ ByState.prototype.wrangleData = function(){
     // Update the visualization
     vis.updateVis();
     vis.makeLegend();
+}
+
+
+
+
+
+
+ByState.prototype.makeDictionaries= function() {
+    var vis = this;
+
+    vis.jobFieldDict = [];   //major job field data (eg, Education)
+    vis.jobTitlesDict = [];  //job title data (eg, Library Assistant)
+    vis.stateTotals = []; //key = state, val = total num jobs in state (only need if doing percentages)
+
+
+    for (var i = 0; i < vis.data.length; i++) {
+
+        if (vis.data[i].OCC_GROUP == "major") {
+            vis.jobFieldDict.push({
+                state: vis.data[i].STATE,
+                jobField: vis.data[i].OCC_TITLE,    //major job field
+                jobsPer1000: vis.data[i].JOBS_1000,//+vis.data[i].JOBS_1000.replace(/\D/g,''),  //jobs in this field per 1000 jobs in state
+                totalJobs: +vis.data[i].TOT_EMP.replace(/\D/g, '')
+            });
+
+        }
+        else if (vis.data[i].OCC_GROUP == "detailed") {
+
+            vis.OCC_CODE = vis.data[i].OCC_CODE;
+            vis.getJobCategory();  //sets vis.jobCategory - for OCC_CODE, returns major job field
+
+            vis.jobTitlesDict.push({
+                state: vis.data[i].STATE,
+                jobField: vis.jobCategory,
+                jobTitle: vis.data[i].OCC_TITLE,
+                OccCode: vis.data[i].OCC_CODE,
+                jobsPer1000: vis.data[i].JOBS_1000,//+vis.data[i].JOBS_1000.replace(/\D/g,''),
+                numJobs: +vis.data[i].TOT_EMP.replace(/\D/g, '')
+
+
+            });
+        }
+        else if (vis.data[i].OCC_GROUP == "total") {
+
+            vis.stateTotals.push({
+                state: vis.data[i].STATE,
+                totalJobs: +vis.data[i].TOT_EMP.replace(/\D/g, '')
+            });
+
+        }
+
+    }
+}
+
+ByState.prototype.makeLikelyDictionaries = function() {
+
+    var vis = this;
+
+    vis.jobFieldDictLikely = [];   //for major job fields and state combos (eg, Management in Alabama)
+    vis.jobFieldDictLikelyPrep=[];  //same as 'jobFieldDictLikely', but without 'per1000' data
+    vis.jobTitlesDictLikely = [];  //detailed data for each job (eg, Library Assistant)
+    vis.stateTotalsLikely = []; //key = state, val = total num jobs in state
+
+    var vis = this;
+
+    //make dict for each single job, with the number of jobs remaining
+    for (var j = 0; j < vis.probabilities.length; j++) {
+        for (var k = 0; k < vis.jobTitlesDict.length; k++) {
+            if (vis.jobTitlesDict[k].OccCode == vis.probabilities[j].SOC_code) { //find matching job OCC code
+
+                if (vis.probabilities[j].Probability >= 0.5) {  //if prob of computerization is >= 0.5, set num jobs to 0
+
+                    vis.jobTitlesDictLikely.push({
+                        state: vis.jobTitlesDict[k].state,
+                        jobField: vis.jobTitlesDict[k].jobField,
+                        jobTitle: vis.jobTitlesDict[k].jobTitle,
+                        OccCode: vis.jobTitlesDict[k].OccCode,
+                        probComputerized: vis.probabilities[j].Probability,
+                        jobsPer1000: 0,
+                        numJobsWithoutComputerization: vis.jobTitlesDict[k].numJobs,
+                        numJobs: 0
+                    });
+
+                    console.log("Made a dict entry where num jobs was ZERO");
+                }
+                else {  //if prob of computerized is < 0.5, num jobs stays the same
+                    vis.jobTitlesDictLikely.push({
+                        state: vis.jobTitlesDict[k].state,
+                        jobField: vis.jobTitlesDict[k].jobField,
+                        jobTitle: vis.jobTitlesDict[k].jobTitle,
+                        OccCode: vis.jobTitlesDict[k].OccCode,
+                        probComputerized: vis.probabilities[j].Probability,
+                        jobsPer1000: vis.jobTitlesDict[k].jobsPer1000,
+                        numJobsWithoutComputerization: vis.jobTitlesDict[k].numJobs,
+                        numJobs: vis.jobTitlesDict[k].numJobs
+                    });
+                }
+
+            }
+        }
+
+
+    }
+
+    //make dict for major job field/state combos (Agriculture in Alabama), and num jobs remaining
+    for (var m = 0; m < vis.jobFieldDict.length; m++) {
+        var totalJobsInFieldAndState = 0;
+        for (var n = 0; n < vis.jobTitlesDictLikely.length; n++) {
+
+            if (vis.jobFieldDict[m].jobField.indexOf(vis.jobTitlesDictLikely[n].jobField) > -1) {  //if major job field matches,
+                if (vis.jobFieldDict[m].state == vis.jobTitlesDictLikely[n].state){                //if state matches
+                    totalJobsInFieldAndState += vis.jobTitlesDictLikely[n].numJobs;
+                }
+            }
+        }
+
+        vis.jobFieldDictLikelyPrep.push({
+            state: vis.jobFieldDict[m].state,
+            jobField: vis.jobFieldDict[m].jobField,
+            totalJobs: totalJobsInFieldAndState
+        });
+
+    }
+
+    //make dict with new state totals
+    for (var h = 0; h < vis.stateTotals.length; h++){
+
+        var numJobsInState = 0;
+        for (var i = 0; i < vis.jobFieldDictLikelyPrep.length; i++){
+            if (vis.stateTotals[h].state === vis.jobFieldDictLikelyPrep[i].state){
+                numJobsInState += vis.jobFieldDictLikelyPrep[i].totalJobs;
+            }
+
+        }
+
+        vis.stateTotalsLikely.push({
+            state: vis.stateTotals[h].state,
+            totalJobs: numJobsInState
+        });
+    }
+
+
+
+    //make dict with num jobs per 1000
+    for (var a = 0; a < vis.jobFieldDictLikelyPrep.length; a++) {
+        for (var b = 0; b < vis.stateTotalsLikely.length; b++) {
+            if (vis.jobFieldDictLikelyPrep[a].state === vis.stateTotalsLikely[b].state) {
+                var per1000 =  Math.round((vis.jobFieldDictLikelyPrep[a].totalJobs/vis.stateTotalsLikely[b].totalJobs) * 1000);
+                //console.log("per1000 is: "+ per1000);
+                vis.jobFieldDictLikely.push({
+                    state: vis.jobFieldDictLikelyPrep[a].state,
+                    jobField: vis.jobFieldDictLikelyPrep[a].jobField,
+                    jobsPer1000: per1000,
+                    totalJobs: vis.jobFieldDictLikelyPrep[a].totalJobs
+                });
+            }
+
+        }
+    }
+
 }
 
 
@@ -337,39 +496,53 @@ ByState.prototype.updateVis = function(){
 //make title for pop-up table
 ByState.prototype.hoverStateData = function(){
     var vis = this;
-    var str = vis.hoveredState + "<br>";
 
-    var filteredDict = vis.jobFieldDict.filter(function(item){
+
+
+    var str = "<span class=tooltip-title>" + vis.hoveredState + " - " + vis.selectedField + "</span><br>";
+
+    vis.beforeRobots = vis.jobFieldDict.filter(function(item){
         return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
     })
 
-    str += "Jobs per 1000: " + filteredDict[0].jobsPer1000 + "<br>";
-    str += "Number of Jobs: "+ filteredDict[0].totalJobs;
+    str += "2015 Jobs per 1000: " + Math.round(vis.beforeRobots[0].jobsPer1000) + "<br>";
+    str += "2015 Number of Jobs: "+ vis.format(vis.beforeRobots[0].totalJobs)+ "<br>";
 
+
+    vis.afterRobots = vis.jobFieldDictLikely.filter(function(item){
+        return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
+    })
+
+
+    str += "Jobs Likely Computerized: "+ vis.format(vis.beforeRobots[0].totalJobs - vis.afterRobots[0].totalJobs);
     return str;
 }
 
 
-//make pop-up table that lists the top-ten jobs (or the only jobs listed), based on number of jobs
-//for the hovered-over state and the selected major job field
 ByState.prototype.popUpTable = function(){
-
     var vis = this;
 
     //get only data for hovered-over state and selected job field
-    var filteredArray = vis.jobTitlesDict.filter(function(item) {
-        return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
+    var filteredArray = vis.jobTitlesDictLikely.filter(function(item) {
+        return (vis.selection.indexOf(item.jobField) > -1 && item.state == vis.hoveredState && item.numJobsWithoutComputerization > 0);
     });
+
 
     //sort jobs descending by number of workers
     filteredArray.sort(function (a, b){
-        return b.numJobs - a.numJobs;
+        return b.probComputerized - a.probComputerized;
     });
 
-    //get only the jobs with top ten (at most) most employees
-    var dataToPrint = [];
+    //title of table
+    var dataToPrint = "<h2>" + vis.hoveredState +": "+ vis.selectedField + " Jobs Most Likely to Be Computerized </h2><table>";
+    //column headers
+    dataToPrint += "<tr><td>Job Title</td><td>Jobs in 2015</td><td>Prob. of Computerization</td></tr>";
+
     for (var i = 0; i < filteredArray.length; i++){
-        dataToPrint[i] = filteredArray[i].jobTitle + ": "+ filteredArray[i].numJobs;
+
+        dataToPrint += "<tr><td>" + filteredArray[i].jobTitle + "</td>";
+        dataToPrint += "<td>" + vis.format(filteredArray[i].numJobsWithoutComputerization) + "</td>";
+        dataToPrint += "<td>" + filteredArray[i].probComputerized + "</td></tr>";
 
         if (i == 9){
             break;
@@ -377,45 +550,23 @@ ByState.prototype.popUpTable = function(){
     }
 
 
-    //Add title to table
-    vis.svgTable.select("text.map-table-title").remove();
+    $("div.map-table").html(dataToPrint + "</table>").addClass("table th td");
 
-    vis.svgTable.append("text")
-        .attr("class", "map-table-title")
-        .attr("x", 5) //x-axis for left edge of text
-        .attr("y", 50)
-        .attr("dy", ".1em")
-        .attr("text-anchor", "start")
-        .text(function(){
-            return vis.hoveredState + " \nTop " +
-                vis.selectedField + " Jobs";
-        });
-
-    //make table with top ten jobs in the selected major job field in this state
-    vis.mapTable = vis.svgTable.selectAll("text.map-table")
-        .data(dataToPrint);
-
-    vis.mapTable.enter()
-        .append("text")
-        .attr("class", "map-table")
-        .attr("x", 5)                              //x-axis for left edge of text
-
-    vis.mapTable.attr("y", function(d, index){    //y-axis for baseline of text
-            return 100 + (index * 20);
-        })
-        .attr("text-anchor", "start")
-        .text(function(d){
-            return d;
-        });
-
-    vis.mapTable.exit().remove();
 
 }
 
 
-
 ByState.prototype.makeLegend = function(){
     var vis = this;
+    if (vis.dataTypeSelected == "Per1000"){
+        vis.legendTitle = ": Jobs per 1000 Jobs in Each State in 2015";
+    }
+    else if (vis.dataTypeSelected == "TotalJobs"){
+        vis.legendTitle = ": Jobs in Each State in 2015"
+    }
+    else if (vis.dataTypeSelected == "Likely"){
+        vis.legendTitle = ": Jobs per 1000 in 2015 - Without Jobs 0.5 or More Likely to Be Computerized"
+    }
 
     vis.selectedJobField();
 
@@ -424,8 +575,8 @@ ByState.prototype.makeLegend = function(){
         .scale(vis.color)
         .orient("horizontal")
         .labelAlign("start")
-        .shapeWidth("75")
-        .title(vis.selectedField + " Jobs per 1000 Jobs in Each State in 2015");
+        .shapeWidth("80")
+        .title(vis.selectedField + vis.legendTitle);
         //.title("Percent of State Jobs in "+ vis.selectedField + " in 2015");
 
     vis.svg.select(".legendQuant")
@@ -445,45 +596,69 @@ ByState.prototype.makeLegend = function(){
 ByState.prototype.addSelectionToMapData = function(){
     var vis = this;
 
+    if (vis.dataTypeSelected == "Per1000") {
+        //Match state to map data and match job field to selection
+        vis.jobFieldDict.forEach(function (item) {
 
-    /*PERCENT JOBS
-    vis.percentJobs.forEach(function(item){
-        if (item.jobField.indexOf(vis.selection) > -1){             //if job field matches selection
-            for (var j = 0; j < vis.USA.length; j++){               //for all map data,
+            if (item.jobField.indexOf(vis.selection) > -1) {             //if job field matches selection
+                for (var j = 0; j < vis.USA.length; j++) {               //for all map data,
 
-                var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
+                    var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
 
-                if (mapState == item.state){                      //if state on map matches,
+                    if (mapState == item.state) {                      //if state on map matches,
 
-                    vis.USA[j].properties[vis.selection] = item.percent;//add jobs data to map data
-                    break;
+                        vis.USA[j].properties[vis.selection] = item.jobsPer1000;//add jobs data to map data
+                        break;
+                    }
+
+
                 }
             }
-        }
 
-    });*/
+        });
+    }
+    else if (vis.dataTypeSelected == "TotalJobs") {
+        //Match state to map data and match job field to selection
+        vis.jobFieldDict.forEach(function (item) {
+
+            if (item.jobField.indexOf(vis.selection) > -1) {             //if job field matches selection
+                for (var j = 0; j < vis.USA.length; j++) {               //for all map data,
+
+                    var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
+
+                    if (mapState == item.state) {                      //if state on map matches,
+
+                        vis.USA[j].properties[vis.selection] = Math.round(item.totalJobs/1000);//add jobs data to map data
+                        break;
+                    }
 
 
-    //Match state to map data and match job field to selection
-    vis.jobFieldDict.forEach(function(item){
-
-        if (item.jobField.indexOf(vis.selection) > -1){             //if job field matches selection
-            for (var j = 0; j < vis.USA.length; j++){               //for all map data,
-
-                var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
-
-                if (mapState == item.state){                      //if state on map matches,
-
-                    vis.USA[j].properties[vis.selection] = item.jobsPer1000;//add jobs data to map data
-                    break;
                 }
-
-
             }
-        }
 
-    });
+        });
+    }
+    if (vis.dataTypeSelected == "Likely") {
+        //Match state to map data and match job field to selection
+        vis.jobFieldDictLikely.forEach(function (item) {
 
+            if (item.jobField.indexOf(vis.selection) > -1) {             //if job field matches selection
+                for (var j = 0; j < vis.USA.length; j++) {               //for all map data,
+
+                    var mapState = stateNames[vis.USA[j].id];           //for map id, get state name
+
+                    if (mapState == item.state) {                      //if state on map matches,
+
+                        vis.USA[j].properties[vis.selection] = item.jobsPer1000;//add jobs data to map data
+                        break;
+                    }
+
+
+                }
+            }
+
+        });
+    }
 
 
 
@@ -619,10 +794,10 @@ ByState.prototype.selectedJobField = function(){
             vis.selectedField = "Education, Training and Library";
             break;
         case "Arts":
-            vis.selectedField = "Arts, Design, Entertainment, Sports, and Media";
+            vis.selectedField = "Arts, Entertainment, Sports, and Media";
             break;
         case "Practitioners":
-            vis.selectedField = "Healthcare Practitioners and Technical";
+            vis.selectedField = "Health Practitioners and Technical";
             break;
         case "Healthcare":
             vis.selectedField = "Healthcare Support";
@@ -631,10 +806,10 @@ ByState.prototype.selectedJobField = function(){
             vis.selectedField = "Protective Service";
             break;
         case "Food":
-            vis.selectedField = "Food Preparation and Serving Related";
+            vis.selectedField = "Food Prep. and Serving";
             break;
         case "Building":
-            vis.selectedField = "Building and Grounds Cleaning and Maintenance";
+            vis.selectedField = "Building, Grounds, and Maintenance";
             break;
         case "Personal":
             vis.selectedField = "Personal Care and Service";
@@ -643,7 +818,7 @@ ByState.prototype.selectedJobField = function(){
             vis.selectedField = "Sales and Related";
             break;
         case "Office":
-            vis.selectedField = "Office and Administrative Support";
+            vis.selectedField = "Office and Admin. Support";
             break;
         case "Farming":
             vis.selectedField = "Farming, Fishing, and Forestry";

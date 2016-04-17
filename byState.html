@@ -17,7 +17,7 @@
 
     <!-- Map: Drop Down Menu -->
     <div class="row">
-        <div class="col-md-12 col-lg-12">
+        <div class="col-md-6 col-lg-6">
             <table id="filter-table"><tr>
                 <td class="filter-table-td">
                     <div class="user-data">
@@ -54,13 +54,29 @@
                 </td>
             </tr></table>
         </div>
+
+        <div class="col-md-6 col-lg-6">
+            <table id="filter-table"><tr>
+                <td class="filter-table-td">
+                    <div class="user-data">
+                        <select id="dataTypeDropdown">
+                            <option value="Per1000">Jobs Per 1000 Jobs in the State</option>
+                            <!--<option value="TotalJobs">Number of Jobs</option>-->
+                            <option value="Likely">Jobs Per 1000, Without Jobs Likely Computerized</option>
+                        </select>
+                    </div>
+                </td>
+                <td class="filter-table-td">
+                </td>
+            </tr></table>
+        </div>
     </div>
 
 
     <!-- Map Visualization and Pop-Up Table  -->
     <div class = "row">
         <div class="col-md-8 col-lg-8" id="by-state"></div>
-        <div class="col-md-4 col-lg-4" id="map-table"></div>
+        <div class="col-md-4 col-lg-4 map-table"></div>
     </div>
 </div>
 
