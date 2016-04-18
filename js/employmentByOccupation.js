@@ -1,3 +1,14 @@
+/**
+ * SOURCES USED:
+ * https://bl.ocks.org/mbostock/3884955
+ * http://bl.ocks.org/mbostock/3035090
+ */
+
+// Global Variables
+var monthYear = d3.time.format("%b-%Y");
+var colorScale = d3.scale.category20();
+var transposedData = [];
+
 /*
  * Load the data
  */
@@ -7,17 +18,17 @@ function loadData() {
         if (error) throw error;
 
         //Process and clean the data
-        //csv.forEach(function(d){
-        //    // Convert string to 'date object'
-        //    d.YEAR = formatDate.parse(d.YEAR);
-        //
-        //    // Convert numeric values to 'numbers'
-        //    d.TEAMS = +d.TEAMS;
-        //    d.MATCHES = +d.MATCHES;
-        //    d.GOALS = +d.GOALS;
-        //    d.AVERAGE_GOALS = +d.AVERAGE_GOALS;
-        //    d.AVERAGE_ATTENDANCE = +d.AVERAGE_ATTENDANCE;
-        //});
+        csv.forEach(function(d){
+            if (d.Date.startsWith("Annual") == false) {
+                d.Date = monthYear.parse(d.Date);
+            }
+
+            for (var prop in d) {
+                if (prop != "Date") {
+                    d[prop] = +d[prop];
+                }
+            }
+        });
 
         // Draw the visualization for the first time
         new EmploymentByOccupation("employment-by-occupation", csv);
@@ -34,9 +45,6 @@ EmploymentByOccupation = function(_parentElement, _data){
     this.parentElement = _parentElement;
     this.data = _data;
     this.displayData = []; // see data wrangling
-
-    // DEBUG RAW DATA
-    console.log(this.data);
 
     this.initVis();
 }
@@ -63,7 +71,6 @@ EmploymentByOccupation.prototype.initVis = function(){
     // Scales and axes
     vis.x = d3.time.scale()
         .range([0, vis.width])
-        .domain(d3.extent(vis.data, function(d) { return d.Year; }));
 
     vis.y = d3.scale.linear()
         .range([vis.height, 0]);
@@ -83,14 +90,20 @@ EmploymentByOccupation.prototype.initVis = function(){
     vis.svg.append("g")
         .attr("class", "y-axis axis");
 
-    // Initialize layout
+    // Define line generator
+    vis.line = d3.svg.line()
+        .interpolate("monotone");
 
+    // Initialize the tooltip
+    vis.tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0]);
 
+    // Update the color scale (all column headers except "Date")
+    colorScale.domain(d3.keys(vis.data[0]).filter(function(d){ return d != "Date"; }))
 
     vis.wrangleData();
 }
-
-
 
 /*
  * Data wrangling - Filter, aggregate, modify data
@@ -99,16 +112,31 @@ EmploymentByOccupation.prototype.initVis = function(){
 EmploymentByOccupation.prototype.wrangleData = function(){
     var vis = this;
 
-    // Filter, aggregate or modify the data
 
+    var filteredData = vis.data.filter(function(d) {
+        if (d.Date instanceof Date) {
+            return true;
+        }
+    })
 
-    vis.displayData = vis.filteredData;
+    var dataCategories = colorScale.domain();
+
+    transposedData = dataCategories.map(function(name) {
+        return {
+            name: name,
+            values: filteredData.map(function(d) {
+                return {Year: d.Date, Population: d[name]};
+            })
+        };
+    });
+
+    vis.displayData = filteredData;
+
+    console.log(transposedData);
 
     // Update the visualization
     vis.updateVis();
 }
-
-
 
 /*
  * The drawing function - should use the D3 update sequence (enter, update, exit)
@@ -119,14 +147,75 @@ EmploymentByOccupation.prototype.updateVis = function(){
     var vis = this;
 
     // Update domain
+    vis.x.domain(d3.extent(vis.displayData, function(d) { return d.Date; }));
+    vis.y.domain([0, d3.max(transposedData, function(d) {
+            return d3.max(d.values, function(e) {
+                return e.Population;
+            });
+        })
+    ]);
 
+    // Call the axes
+    vis.svg.select(".y-axis")
+        .transition()
+        .duration(800)
+        .call(vis.yAxis);
 
-    // Data Join
+    vis.svg.select(".x-axis")
+        .transition()
+        .duration(800)
+        .call(vis.xAxis);
 
+    // Update tooltip HTML
+    //tip.html(function(d) {
+    //    return "Edition: " + formatDate(d.YEAR) + ", " + d.LOCATION + "</br>" +
+    //        chartValue + ": " +  d[chartData];
+    //});
 
-    // Enter/Update/Exit
+    // Call the tooltip
+    //svg.call(tip);
 
+    // Don't include empty values on the line chart
+    vis.line.defined(function(d) {
+        return d.Population != 0;
+    })
 
+    // Define the x/y coordinates for the line
+    vis.line.x( function(d) { return vis.x(d.Year); })
+    vis.line.y( function(d) { return vis.y(d.Population); })
+
+    // Attach the line to the d attribute of the <path>
+    //vis.svg.selectAll(".line")
+    //    .datum(transposedData)
+    //    .transition()
+    //    .duration(800)
+    //    .attr("d", function(d) {
+    //        return vis.line(d.values)
+    //    });
+
+    // Draw the layers
+    var categories = vis.svg.selectAll(".line")
+        .data(transposedData);
+
+    categories.enter().append("path")
+        .attr("class", "line")
+        .transition()
+        .duration(800);
+
+    categories
+        .style("stroke", function(d) {
+            return colorScale(d.name);
+        })
+        .attr("d", function(d) {
+            return vis.line(d.values);
+        })
+
+        //// TO-DO: Update tooltip text
+        //.on("mouseover", function(d) {
+        //    vis.svg.select(".label").text(d.name);
+        //})
+
+    categories.exit().remove();
 
     // Call axis functions with the new domain
     vis.svg.select(".x-axis").call(vis.xAxis);

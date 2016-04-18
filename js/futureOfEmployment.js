@@ -40,13 +40,8 @@ FutureOfEmployment = function(_parentElement, _data){
     this.data = _data;
     this.displayData = []; // see data wrangling
 
-    // DEBUG RAW DATA
-    console.log(this.data);
-
     this.initVis();
 }
-
-
 
 /*
  * Initialize visualization (static content, e.g. SVG area or axes)
@@ -54,7 +49,7 @@ FutureOfEmployment = function(_parentElement, _data){
 FutureOfEmployment.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 10, right: 0, bottom: 10, left: 10 };
+    vis.margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
     vis.width = 900 - vis.margin.left - vis.margin.right,
         vis.height = 1500 - vis.margin.top - vis.margin.bottom;
@@ -154,8 +149,6 @@ FutureOfEmployment.prototype.wrangleData = function(){
     // Update the visualization
     vis.updateVis();
 }
-
-
 
 /*
  * The drawing function - should use the D3 update sequence (enter, update, exit)
