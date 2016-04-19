@@ -6,8 +6,8 @@
 
 // Global Variables
 var monthYear = d3.time.format("%b-%Y");
+var year = d3.time.format("%Y");
 var colorScale = d3.scale.category20();
-var transposedData = [];
 
 /*
  * Load the data
@@ -30,8 +30,18 @@ function loadData() {
             }
         });
 
+        // Filter out dates from global dataset
+        var filteredData = csv.filter(function(d) {
+            if (d.Date instanceof Date) {
+                if(d.Date >= year.parse("2000") && d.Date < monthYear.parse("Apr-2016")) {
+                    return true;
+                }
+            }
+        });
+
         // Draw the visualization for the first time
-        new EmploymentByOccupation("employment-by-occupation", csv);
+        employmentByOccupation = new EmploymentByOccupation("employment-by-occupation", filteredData);
+        createTimelineVis();
     });
 }
 
@@ -45,6 +55,7 @@ EmploymentByOccupation = function(_parentElement, _data){
     this.parentElement = _parentElement;
     this.data = _data;
     this.displayData = []; // see data wrangling
+    this.transposedData = [];
 
     this.initVis();
 }
@@ -56,7 +67,7 @@ EmploymentByOccupation = function(_parentElement, _data){
 EmploymentByOccupation.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 60, left: 60 };
+    vis.margin = { top: 30, right: 10, bottom: 60, left: 60 };
 
     vis.width = 800 - vis.margin.left - vis.margin.right,
         vis.height = 400 - vis.margin.top - vis.margin.bottom;
@@ -68,9 +79,16 @@ EmploymentByOccupation.prototype.initVis = function(){
         .append("g")
         .attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
 
+    vis.svg.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", vis.width)
+        .attr("height", vis.height + 10);
+
     // Scales and axes
     vis.x = d3.time.scale()
-        .range([0, vis.width])
+        .domain(d3.extent(vis.data, function(d) { return d.Date; }))
+        .range([0, vis.width]);
 
     vis.y = d3.scale.linear()
         .range([vis.height, 0]);
@@ -99,6 +117,11 @@ EmploymentByOccupation.prototype.initVis = function(){
         .attr('class', 'd3-tip')
         .offset([-10, 0]);
 
+    vis.svg.append("g")
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "translate(10,10)");
+
     // Update the color scale (all column headers except "Date")
     colorScale.domain(d3.keys(vis.data[0]).filter(function(d){ return d != "Date"; }))
 
@@ -108,31 +131,48 @@ EmploymentByOccupation.prototype.initVis = function(){
 /*
  * Data wrangling - Filter, aggregate, modify data
  */
-
 EmploymentByOccupation.prototype.wrangleData = function(){
     var vis = this;
 
+    var percentChange = clone(vis.data);
 
-    var filteredData = vis.data.filter(function(d) {
-        if (d.Date instanceof Date) {
-            return true;
+    percentChange.forEach(function(d) {
+        for (var prop in d) {
+            if (prop != "Date") {
+                d[prop] = (d[prop] - vis.data[0][prop])/vis.data[0][prop];
+            }
         }
-    })
+    });
 
     var dataCategories = colorScale.domain();
 
-    transposedData = dataCategories.map(function(name) {
+    vis.transposedData = dataCategories.map(function(name) {
         return {
             name: name,
-            values: filteredData.map(function(d) {
+            values: percentChange.map(function(d) {
                 return {Year: d.Date, Population: d[name]};
             })
         };
     });
 
-    vis.displayData = filteredData;
+    var inputs = $('input:checked').map(function() {
+        return this.value;
+    });
 
-    console.log(transposedData);
+    // Filter out totals, unemployment rate and unchecked items
+    var transposedData = vis.transposedData.filter(function(d) {
+        if (d.name.split("-")[1] != "Total" &&
+            d.name.split("-")[0] != "Unemployment rate") {
+            for(var name in inputs) {
+                if (inputs[name] == d.name) {
+                    return true;
+                }
+            }
+        }
+    });
+
+    vis.displayData = vis.data;
+    vis.transposedData = transposedData;
 
     // Update the visualization
     vis.updateVis();
@@ -147,8 +187,13 @@ EmploymentByOccupation.prototype.updateVis = function(){
     var vis = this;
 
     // Update domain
-    vis.x.domain(d3.extent(vis.displayData, function(d) { return d.Date; }));
-    vis.y.domain([0, d3.max(transposedData, function(d) {
+    vis.y.domain([
+        d3.min(vis.transposedData, function(d) {
+            return d3.min(d.values, function(e) {
+                return e.Population;
+            });
+        }),
+        d3.max(vis.transposedData, function(d) {
             return d3.max(d.values, function(e) {
                 return e.Population;
             });
@@ -176,49 +221,85 @@ EmploymentByOccupation.prototype.updateVis = function(){
     //svg.call(tip);
 
     // Don't include empty values on the line chart
-    vis.line.defined(function(d) {
-        return d.Population != 0;
-    })
+    vis.line.defined(function(d) { return d.Population != -1; })
 
     // Define the x/y coordinates for the line
     vis.line.x( function(d) { return vis.x(d.Year); })
     vis.line.y( function(d) { return vis.y(d.Population); })
 
-    // Attach the line to the d attribute of the <path>
-    //vis.svg.selectAll(".line")
-    //    .datum(transposedData)
-    //    .transition()
-    //    .duration(800)
-    //    .attr("d", function(d) {
-    //        return vis.line(d.values)
-    //    });
-
-    // Draw the layers
+    // Enter/Update/Exit
     var categories = vis.svg.selectAll(".line")
-        .data(transposedData);
+        .data(vis.transposedData);
 
     categories.enter().append("path")
         .attr("class", "line")
-        .transition()
-        .duration(800);
+        .on("mouseover", function (d) {
+            d3.select(this).style("stroke-width", "4px");
+            vis.svg.select(".label").text(d.name);
+            //$("label > input[value='" + d.name + "']").css("font-weight", "bold");
+        })
+        .on("mouseout", function (d) {
+            d3.select(this).transition().style("stroke-width", "1px");
+        });
 
     categories
         .style("stroke", function(d) {
             return colorScale(d.name);
         })
+        .transition()
+        .duration(800)
         .attr("d", function(d) {
             return vis.line(d.values);
         })
 
-        //// TO-DO: Update tooltip text
-        //.on("mouseover", function(d) {
-        //    vis.svg.select(".label").text(d.name);
-        //})
-
     categories.exit().remove();
-
-    // Call axis functions with the new domain
-    vis.svg.select(".x-axis").call(vis.xAxis);
-    vis.svg.select(".y-axis").call(vis.yAxis);
 }
 
+/*
+ * Call wrangleData if the drop down or radio buttons change
+ */
+$(document).ready(function() {
+    $("input[type=checkbox]").change(function() {
+        employmentByOccupation.wrangleData();
+    })
+});
+
+/**
+ * Clone an object
+ * @see http://stackoverflow.com/a/728694/1751883
+ * @param obj
+ * @returns {*}
+ */
+function clone(obj) {
+    var copy;
+
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        copy = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+            copy[i] = clone(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+}

@@ -92,9 +92,26 @@ g:hover > g.group:hover {
     opacity:.5;
 }
 
+.x-axis path {
+    display: none;
+}
+
 .line {
     fill: none;
+    opacity: 0.7;
+    clip-path: url(#clip);
 }
+
+.line:hover {
+    opacity: 1;
+}
+
+.brush .extent {
+    stroke: #fff;
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}
+
 
 /**********************/
 /*     UNITS SOLD     */

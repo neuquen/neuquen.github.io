@@ -26,3 +26,18 @@ var socMap =
     "53": "Transportation and Material Moving",
     "55": "Military Specific"
 };
+
+
+// Global variables for shared views
+var employmentByOccupation, timeline;
+
+
+function brushed() {
+    // Set new domain if brush (user selection) is not empty
+    employmentByOccupation.x.domain(
+        timeline.brush.empty() ? timeline.x.domain() : timeline.brush.extent()
+    );
+
+    // Update focus chart (detailed information)
+    employmentByOccupation.wrangleData();
+}

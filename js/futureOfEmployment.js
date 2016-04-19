@@ -172,7 +172,7 @@ FutureOfEmployment.prototype.updateVis = function(){
                 $("#soc-fields").val(d.SOC_code);
                 vis.wrangleData();
             }
-        });;
+        });
 
     dataJoin
         .transition()
@@ -253,9 +253,12 @@ $(document).ready(function() {
     })
 });
 
-/*
+/**
  * Push a key and value to an array.
  * @see http://stackoverflow.com/a/36612459/1751883
+ * @param key
+ * @param value
+ * @returns {*}
  */
 function pushToArray(key, value){
 
