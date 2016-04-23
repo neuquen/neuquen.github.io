@@ -67,7 +67,7 @@ EmploymentByOccupation = function(_parentElement, _data){
 EmploymentByOccupation.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 20, right: 10, bottom: 60, left: 40 };
+    vis.margin = { top: 20, right: 10, bottom: 20, left: 40 };
 
     vis.width = 750 - vis.margin.left - vis.margin.right,
         vis.height = 400 - vis.margin.top - vis.margin.bottom;
@@ -111,9 +111,9 @@ EmploymentByOccupation.prototype.initVis = function(){
     // Add the y axis label
     yGroup.append("text")
         .attr("class", "axis-label")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("transform", "translate(10,85)rotate(-90)")
+        .attr("x", -85)
+        .attr("y", 10)
+        .attr("transform", "rotate(-90)")
         .text("Percent Change");
 
     // Define line generator

@@ -43,7 +43,7 @@ div.tooltip {
 /*     BAR CHART     */
 /*********************/
 .bars {
-    fill: lightblue;
+    fill: #2BBE83;
 }
 
 .percentage {
@@ -91,13 +91,6 @@ g:hover > g.group:hover, g.group {
     fill: #333;
 }
 
-.dot {
-    fill: #31a354;
-    stroke: #1C9A3D;
-    stroke-width: 1.5px;
-    opacity:.5;
-}
-
 .x-axis path {
     display: none;
 }
@@ -124,21 +117,26 @@ g:hover > g.group:hover, g.group {
 .unemployed-checkbox label span {
     font-size: .85em;
     position:relative;
-    left: 30px;
+    left: 45px;
     font-weight:normal;
 }
 
 .unemployed-checkbox {
     position:relative;
-    left: 28px;
+    left: 47px;
 }
 
 .future-of-employment-filter h6{
     display:inline-block;
     position:relative;
-    right: 25px;
+    right: 32px;
     font-weight:bold;
     cursor:pointer;
+
+    background-color: #2BBE83;
+    padding: 3px 4px;
+    border-radius: 3px;
+    color: white;
 }
 
 .future-of-employment-filter h4 {
@@ -151,6 +149,15 @@ g:hover > g.group:hover, g.group {
 
 .line-chart-title {
     text-align:center;
+    padding-left:40px;
+}
+
+.extent{
+    fill: #2BBE83;
+}
+
+.label {
+    fill:darkgray;
 }
 
 /**********************/

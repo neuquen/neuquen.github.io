@@ -22,7 +22,7 @@ Timeline = function(_parentElement, _data){
 Timeline.prototype.initVis = function(){
 	var vis = this; // read about the this
 
-	vis.margin = { top: 10, right: 10, bottom: 60, left: 60 };
+	vis.margin = { top: 20, right: 10, bottom: 20, left: 40 };
 
 	vis.width = 750 - vis.margin.left - vis.margin.right,
     vis.height = 100 - vis.margin.top - vis.margin.bottom;
@@ -33,6 +33,16 @@ Timeline.prototype.initVis = function(){
 	    .attr("height", vis.height + vis.margin.top + vis.margin.bottom)
 	  .append("g")
 	    .attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
+
+	vis.svg.append("rect")
+		.attr("width", vis.width)
+		.attr("height", vis.height)
+		.attr("fill", "#f2f2f2");
+
+	vis.svg.append("text")
+		.attr("x", vis.width/3)
+		.attr("y", vis.height/2)
+		.text("Click and Drag to Filter by Date");
 
 	// Scales and axes
     vis.x = d3.time.scale()
@@ -67,8 +77,8 @@ Timeline.prototype.initVis = function(){
 		.attr("class", "x brush")
 		.call(vis.brush)
 		.selectAll("rect")
-		.attr("y", -6)
-		.attr("height", vis.height + 7);
+		.attr("y", 0)
+		.attr("height", vis.height);
 
   vis.svg.append("g")
       .attr("class", "x-axis axis")
