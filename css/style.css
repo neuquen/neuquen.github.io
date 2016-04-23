@@ -92,6 +92,12 @@ g:hover > g.group:hover, g.group {
     background-color: #f2f2f2;
     padding: 25px 25px 15px 25px;
     border-radius: 5px;
+    text-align:center;
+}
+
+.future-of-employment-sort {
+    margin: 0 auto;
+    width: 85%;
 }
 
 /**********************/
@@ -156,6 +162,10 @@ g:hover > g.group:hover, g.group {
     padding: 3px 4px;
     border-radius: 3px;
     color: white;
+}
+
+.employment-by-occupation-filter h6:hover {
+    background-color: #27AB76;
 }
 
 .employment-by-occupation-filter h4 {
