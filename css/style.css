@@ -74,6 +74,25 @@ g:hover > g.group:hover, g.group {
     -webkit-transition: all .15s ease-in-out;
 }
 
+.future-of-employment-sort .btn {
+    margin-bottom:10px;
+}
+
+.future-of-employment-sort > .btn:last-child {
+    border-radius:0;
+}
+
+.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.future-of-employment-filter {
+    float: right;
+    background-color: #f2f2f2;
+    padding: 25px 25px 15px 25px;
+    border-radius: 5px;
+}
 
 /**********************/
 /*     LINE CHART     */
@@ -123,7 +142,7 @@ g:hover > g.group:hover, g.group {
 
 .unemployed-checkbox {
     position:relative;
-    left: 47px;
+    left: 49px;
 }
 
 .future-of-employment-filter h6{
@@ -404,4 +423,16 @@ code {
 h1,h2,h3,h4,h5,h6 {
     text-align:center;
     font-family: 'Cinzel', serif;
+}
+
+@media (min-width: 48em) {
+    body > .container {
+        padding: 150px 15px 0;
+    }
+}
+
+@media (min-width: 75em) {
+    body > .container {
+        padding: 60px 15px 0;
+    }
 }

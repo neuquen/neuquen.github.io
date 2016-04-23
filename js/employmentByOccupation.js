@@ -228,12 +228,17 @@ EmploymentByOccupation.prototype.updateVis = function(){
     categories.enter().append("path")
         .attr("class", "line")
         .on("mouseover", function (d) {
-            d3.select(this).style("stroke-width", "4px");
+            d3.selectAll(".line").style("opacity", ".7");
+            d3.select(this)
+                .style("stroke-width", "5px")
+                .style("opacity", "1");
+
             vis.svg.select(".label").text(d.name);
-            //$("label > input[value='" + d.name + "']").css("font-weight", "bold");
+
         })
         .on("mouseout", function (d) {
             d3.select(this).transition().style("stroke-width", "1px");
+            d3.selectAll(".line").style("opacity", "1");
         });
 
     categories
