@@ -364,6 +364,10 @@ body > .container {
     padding-left: 15px;
 }
 
+.footer-span {
+    float:right;
+}
+
 code {
     font-size: 80%;
 }
@@ -384,4 +388,13 @@ code {
 
 .navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a , .footer p {
     color: white;
+}
+
+* {
+    font-family: 'Merriweather', serif;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    text-align:center;
+    font-family: 'Cinzel', serif;
 }
