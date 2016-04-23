@@ -145,7 +145,7 @@ g:hover > g.group:hover, g.group {
     left: 49px;
 }
 
-.future-of-employment-filter h6{
+.employment-by-occupation-filter h6{
     display:inline-block;
     position:relative;
     right: 32px;
@@ -158,7 +158,7 @@ g:hover > g.group:hover, g.group {
     color: white;
 }
 
-.future-of-employment-filter h4 {
+.employment-by-occupation-filter h4 {
     text-align:center;
 }
 
