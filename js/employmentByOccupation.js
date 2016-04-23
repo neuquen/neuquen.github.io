@@ -67,7 +67,7 @@ EmploymentByOccupation = function(_parentElement, _data){
 EmploymentByOccupation.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 30, right: 10, bottom: 60, left: 60 };
+    vis.margin = { top: 20, right: 10, bottom: 60, left: 40 };
 
     vis.width = 750 - vis.margin.left - vis.margin.right,
         vis.height = 400 - vis.margin.top - vis.margin.bottom;
@@ -105,22 +105,25 @@ EmploymentByOccupation.prototype.initVis = function(){
         .attr("class", "x-axis axis")
         .attr("transform", "translate(0," + vis.height + ")");
 
-    vis.svg.append("g")
+    var yGroup = vis.svg.append("g")
         .attr("class", "y-axis axis");
+
+    // Add the y axis label
+    yGroup.append("text")
+        .attr("class", "axis-label")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("transform", "translate(10,85)rotate(-90)")
+        .text("Percent Change");
 
     // Define line generator
     vis.line = d3.svg.line()
         .interpolate("monotone");
 
-    // Initialize the tooltip
-    vis.tip = d3.tip()
-        .attr('class', 'd3-tip')
-        .offset([-10, 0]);
-
     vis.svg.append("g")
         .append("text")
         .attr("class", "label")
-        .attr("transform", "translate(10,10)");
+        .attr("transform", "translate(10,-10)");
 
     // Update the color scale (all column headers except "Date")
     colorScale.domain(d3.keys(vis.data[0]).filter(function(d){ return d != "Date"; }))
@@ -211,15 +214,6 @@ EmploymentByOccupation.prototype.updateVis = function(){
         .duration(800)
         .call(vis.xAxis);
 
-    // Update tooltip HTML
-    //tip.html(function(d) {
-    //    return "Edition: " + formatDate(d.YEAR) + ", " + d.LOCATION + "</br>" +
-    //        chartValue + ": " +  d[chartData];
-    //});
-
-    // Call the tooltip
-    //svg.call(tip);
-
     // Don't include empty values on the line chart
     vis.line.defined(function(d) { return d.Population != -1; })
 
@@ -256,12 +250,35 @@ EmploymentByOccupation.prototype.updateVis = function(){
 }
 
 /*
- * Call wrangleData if the drop down or radio buttons change
+ * Checkbox functionality
  */
 $(document).ready(function() {
     $("input[type=checkbox]").change(function() {
         employmentByOccupation.wrangleData();
-    })
+    });
+
+    var employedClickState = true;
+    $("#employed-filter-label").click(function() {
+        if(employedClickState) {
+            d3.selectAll(".employed-checkbox input").property("checked", true);
+        } else {
+            d3.selectAll(".employed-checkbox input").property("checked", false);
+        }
+        employmentByOccupation.wrangleData();
+        employedClickState = !employedClickState;
+    });
+
+    var unemployedClickState = true;
+    $("#unemployed-filter-label").click(function() {
+        if(unemployedClickState) {
+            d3.selectAll(".unemployed-checkbox input").property("checked", true);
+        } else {
+            d3.selectAll(".unemployed-checkbox input").property("checked", false);
+        }
+        employmentByOccupation.wrangleData();
+        unemployedClickState = !unemployedClickState;
+    });
+
 });
 
 /**

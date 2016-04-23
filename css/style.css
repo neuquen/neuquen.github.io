@@ -117,6 +117,41 @@ g:hover > g.group:hover, g.group {
     shape-rendering: crispEdges;
 }
 
+.employed-checkbox {
+    top: -12.5px;
+}
+
+.unemployed-checkbox label span {
+    font-size: .85em;
+    position:relative;
+    left: 30px;
+    font-weight:normal;
+}
+
+.unemployed-checkbox {
+    position:relative;
+    left: 28px;
+}
+
+.future-of-employment-filter h6{
+    display:inline-block;
+    position:relative;
+    right: 25px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.future-of-employment-filter h4 {
+    text-align:center;
+}
+
+.axis-label{
+    font-weight:bold;
+}
+
+.line-chart-title {
+    text-align:center;
+}
 
 /**********************/
 /*     UNITS SOLD     */
@@ -333,15 +368,20 @@ code {
     font-size: 80%;
 }
 
-.employed-checkbox {
-    top: -12.5px;
+.navbar, .footer {
+    background-color: #7EB1DC;
 }
 
-.employed-checkbox label span, .unemployed-checkbox label span {
-    font-size: .85em;
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover {
+    background-color: #5393C8;
+    color: white;
 }
 
-/*.unemployed-checkbox label span {*/
-    /*position:relative;*/
-    /*right: -200px;*/
-/*}*/
+.table>tbody>tr.info>td, .table>tbody>tr.info>th, .table>tbody>tr>td.info, .table>tbody>tr>th.info, .table>tfoot>tr.info>td, .table>tfoot>tr.info>th, .table>tfoot>tr>td.info, .table>tfoot>tr>th.info, .table>thead>tr.info>td, .table>thead>tr.info>th, .table>thead>tr>td.info, .table>thead>tr>th.info {
+    background-color: #2BBE83;
+    color: white;
+}
+
+.navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a , .footer p {
+    color: white;
+}
