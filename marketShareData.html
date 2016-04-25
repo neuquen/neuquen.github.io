@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Robotics Market Share</title>
+    <title>Robotics Market Size</title>
 
     <!-- Font CSS -->
     <link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
@@ -35,7 +35,7 @@
             <ul class="nav navbar-nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="robotUnitsSold.html">Robotics Sales</a></li>
-                <li class="active"><a href="marketShareData.html">Robotics Market Share</a></li>
+                <li class="active"><a href="marketShareData.html">Robotics Market Size</a></li>
                 <li><a href="futureOfEmployment.html">Impact of Computerization</a></li>
                 <li><a href="byState.html">Computerization by State</a></li>
                 <li><a href="employmentByOccupation.html">Employment Trends</a></li>
@@ -59,23 +59,37 @@
     </div>
 
     <div class = "row">
+        <div id="market-size-plot-title"> Forcasted Robotics Market Size in US </div>
+        <div id="market-plot-subtitle" >Circle size is proportional to market size.</div>
+        <br><br>
+        <div id="market-list-subtitle2" >Drag a sector to the correct circle. </div>
+    </div>
+
+    <div class = "row">
+
         <div class="col-md-2 col-lg-2">
-            <div class="row centergrid" id="market-list-subtitle" >Drag a sector to the correct circle.</div>
             <div class="row ui-widget-content draggable" id="Finance" > <p>Finance</p></div>
-            <div class="row ui-widget-content  draggable" id="Agriculture" > <p>Agriculture</p></div>
-            <div class="row ui-widget-content  draggable" id="Service" > <p>Service</p></div>
-            <div class="row ui-widget-content  draggable" id="Industrial" > <p>Industrial</p></div>
+            <div class="row ui-widget-content draggable" id="Agriculture" > <p>Agriculture</p></div>
+            <div class="row ui-widget-content draggable" id="Service" > <p>Service</p></div>
+            <div class="row ui-widget-content draggable" id="Industrial" > <p>Industrial</p></div>
             <div class="row ui-widget-content draggable" id="Healthcare" > <p>Healthcare</p></div>
-            <div class="row ui-widget-content  draggable" id="AI" > <p>Artificial Intelligence</p></div>
-            <div class="row ui-widget-content draggable" id="Aerospace" > <p>Aerospace & Defense</p></div>
-            <div class="row ui-widget-content draggable" id="Autos" > <p>Autos & Transport</p></div>
+            <div class="row ui-widget-content draggable draggable-wide" id="Artificial"> <p>Artificial Intelligence</p></div>
+            <div class="row ui-widget-content draggable" id="Aerospace" > <p>Defense</p></div>
+            <div class="row ui-widget-content draggable" id="Transport" > <p>Transport</p></div>
         </div>
 
         <div class="col-md-10 col-lg-10">
             <div class= "bigbox" id="market-share-plot" ></div>
         </div>
-
     </div>
+
+    <div class = "row">
+        <br>
+        <div class="data-source">Source: Robot Revolution - Global Robot & AI Primer, Bank of America Merrill Lynch <br>
+        "http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf"</div>
+        <br>
+    </div>
+
 </div>
 
 <footer class="footer">

@@ -199,6 +199,8 @@ table{
 /* add table borders to area that shows data stats */
 td {
     border-bottom: 1px solid #ABB2B9;
+    width: 100px;
+    word-wrap: break-word;
 }
 
 /* format table rows/cells that have selected building data */
@@ -241,21 +243,14 @@ h2 {
     text-align:center;
     font-size: 20px;
     font-weight:bold;
-    padding:30px 1px 50px 1px;  /*top right bottom left padding */
+    padding:30px 1px 0px 1px;  /*top right bottom left padding */
 }
-
-.map-state-and-table{
-    position:relative;
-    /*display:inline;*/
-}
-
-
 
 
 /* center bootstrap grid columns*/
-.centergrid {
-    text-align:center;
-    vertical-align: top;
+.leftAlignGrid {
+    text-align:left;
+    /*vertical-align: top;*/
 }
 
 /* center image/text inside columns */
@@ -268,13 +263,40 @@ h2 {
     vertical-align:top;
 }
 
+/* add padding to column that shows selected building data */
+.market-size-table-column{
+    /*margin:20px;*/
+    /*padding:5px;*/
+    padding:20px 0px 0px 1px;  /*top right bottom left padding */
+}
 
+#dataTypeDropDown{
+    text-align: left;
+}
+
+#mapDropDown{
+    text-align:right;
+}
+
+.market-size-dropdowns{
+    padding:20px 0px 0px 0px;  /*top right bottom left padding */
+}
+
+.map-vis-title{
+    font-size:18px;
+}
 
 /**********************/
-/*    MARKET SHARE    */
+/*    MARKET SIZE    */
 /**********************/
 
 
+
+.axis text, .market-size-axis {
+    font-family: sans-serif;
+    font-size: 20px;
+    fill: #333;
+}
 
 .draggable {
     width: 75px;
@@ -293,6 +315,9 @@ h2 {
     stroke: black;
 }
 
+.invisibleCircle{
+    opacity: 0;
+}
 
 /* center bootstrap grid columns*/
 .centergrid {
@@ -302,29 +327,58 @@ h2 {
 
 
 .draggable {
-    width: 150px;
+    width: 90px;
     height: 25px;
-    padding-left: 0.5em;
-    /* resource for centering grid columns:
-       http://www.minimit.com/articles/solutions-tutorials/bootstrap-3-responsive-centered-columns */
-   text-align: left;
+    padding-left: 0.25em;
+    padding-top: 0.2em;
+    text-align: left;
     float:none;
     vertical-align:middle;
     margin:20px;
 }
 
-#market-list-subtitle{
-    width: 400px;
-    height: 30px;
-    text-align:center;
+.draggable-wide {
+    width: 90px;
+    height: 50px;
+}
+
+#market-plot-subtitle {
+
+    fill: #333;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+
+}
+
+#market-list-subtitle {
+    fill: #333;
+    font-size: 16px;
+    text-align: center;
+}
+
+#market-list-subtitle2 {
+    fill: #333;
     font-size: 20px;
-    font-weight:bold;
-    /*margin:10px;*/
-    padding:50px 1px 40px 1px;  /*top right bottom left padding */
+    font-weight: bold;
+    text-align: left;
 }
 
 #market-share-text{
     padding:0px 1px 40px 1px;  /*top right bottom left padding */
+}
+
+#market-size-plot-title{
+    fill: #333;
+    font-size: 32px;
+    font-weight:bold;
+    text-decoration:underline;
+    text-align: center;
+}
+
+.plot-subtitle{
+    font-size: 20px;
+    text-align: center;
 }
 
 

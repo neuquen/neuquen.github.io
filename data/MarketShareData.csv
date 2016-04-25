@@ -1,9 +1,9 @@
-sector,marketShare,unit,year
-AI,70,billion,2020
-Industrial,24,billion,2025
-Autos & Transport,200,billion,2025
-Aerospace & Defense,82,billion,2025
-Finance,255,billion,2018
-Healthcare,34,billion,2020
-"Service (care-bots, education, etc)",17.4,billion,2020
-Agriculture,16.3,billion,2020
+sector,marketShare,unit,year,ypos
+Artificial Intelligence,70,billion,2020,1
+Industrial,24,billion,2025,3.5
+Autos & Transport,200,billion,2025,1
+Aerospace & Defense,82,billion,2025,2.5
+Finance,255,billion,2018,1
+Healthcare,34,billion,2020,2
+Services,17.4,billion,2020,3
+Agriculture,16.3,billion,2020,4
