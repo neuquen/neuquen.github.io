@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Robotics Market Size</title>
+    <title>Economy-Wide Impact</title>
 
     <!-- Font CSS -->
     <link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
@@ -34,10 +34,10 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="robotUnitsSold.html">Robotics Sales</a></li>
-                <li class="active"><a href="marketShareData.html">Robotics Market Size</a></li>
-                <li><a href="futureOfEmployment.html">Impact of Computerization</a></li>
-                <li><a href="byState.html">Computerization by State</a></li>
+                <li><a href="robotUnitsSold.html">Robotics' Rapid Growth</a></li>
+                <li class="active"><a href="marketShareData.html">Economy-Wide Impact</a></li>
+                <li><a href="futureOfEmployment.html">Jobs Likely Roboticized</a></li>
+                <li><a href="byState.html">Impact by State</a></li>
                 <li><a href="employmentByOccupation.html">Employment Trends</a></li>
 
             </ul>
@@ -48,25 +48,44 @@
 <!-- Include body content here -->
 <div class="container">
 
-    <div class="page-header">
-        <h1>ROBOTICS MARKET SHARE</h1>
-    </div>
-
-    <!-- Visualization Placeholder -->
-
     <div class = "row">
-        <div class="col-md-12 col-lg-12 centergrid" id="market-share-text" >EXPLANATORY TEXT</div>
+        <div class="page-header"><h1>ECONOMY-WIDE IMPACT</h1></div>
     </div>
 
     <div class = "row">
-        <div id="market-size-plot-title"> Forcasted Robotics Market Size in US </div>
-        <div id="market-plot-subtitle" >Circle size is proportional to market size.</div>
-        <br><br>
-        <div id="market-list-subtitle2" >Drag a sector to the correct circle. </div>
+        <div class = "col-md-6 explanatory-text">
+            Decades ago, robots could lift heavy objects and weld parts in assembly lines.
+            Now, with sophisticated new technologies, robots can handles increasingly complex and varied tasks, such as [x] and [y].
+            <br><br>
+            With these new capabilities, robots have the potential to impact virtually every sector in the US economy.
+            In 2015, the Bank of America Merril Lynch analyzed the anticipated growth of artificial intelligence and automation,
+            and predicted that robotics would become a $X billion industry by 2025.
+            <br><br>
+            Below, explore the expected near-term future market sizes for robotics across 8 major economic sectors.
+
+        </div>
+        <div class = "col-md-6">
+            <img class ="market-size-img" src="img/robot-filling-boxes.png"/><!--</figure>-->
+            <span class = "img-caption">Source: Rethink Robotics/YouTube via
+                <a href=http://www.slate.com/articles/health_and_science/new_scientist/2014/05/robots_taking_jobs_technology_will_replace_driving_routine_physical_labor.html>
+                Slate</a>
+            </span>
+        </div>
+    </div>
+
+    <br>
+
+    <div class = "row">
+        <div class="col-md-12 col-lg-12">
+            <div class="grey-background-plot-title"> Forcasted Robotics US Market Sizes by Sector </div>
+            <div class="grey-background-plot-subtitle" >Circle size is proportional to market size.</div>
+        </div>
+        <div class="col-md-12 col-lg-12" id="drag-drop-directions" >Drag a sector to the correct circle. </div>
     </div>
 
     <div class = "row">
 
+        <!-- draggable widgets -->
         <div class="col-md-2 col-lg-2">
             <div class="row ui-widget-content draggable" id="Finance" > <p>Finance</p></div>
             <div class="row ui-widget-content draggable" id="Agriculture" > <p>Agriculture</p></div>
@@ -78,6 +97,7 @@
             <div class="row ui-widget-content draggable" id="Transport" > <p>Transport</p></div>
         </div>
 
+        <!-- visualization -->
         <div class="col-md-10 col-lg-10">
             <div class= "bigbox" id="market-share-plot" ></div>
         </div>
@@ -85,8 +105,11 @@
 
     <div class = "row">
         <br>
-        <div class="data-source">Source: Robot Revolution - Global Robot & AI Primer, Bank of America Merrill Lynch <br>
-        "http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf"</div>
+        <div class="data-source">Source:
+            <a href = http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf>
+                Robot Revolution - Global Robot & AI Primer, Bank of America Merrill Lynch, December 16, 2015
+            </a>
+        </div>
         <br>
     </div>
 

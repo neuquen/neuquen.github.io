@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Robotics Sales</title>
+    <title>Robotics' Rapid Growth</title>
 
     <!-- Font CSS -->
     <link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
@@ -31,10 +31,10 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="index.html">Home</a></li>
-                <li class="active"><a href="robotUnitsSold.html">Robotics Sales</a></li>
-                <li><a href="marketShareData.html">Robotics Market Share</a></li>
-                <li><a href="futureOfEmployment.html">Impact of Computerization</a></li>
-                <li><a href="byState.html">Computerization by State</a></li>
+                <li class="active"><a href="robotUnitsSold.html">Robotics' Rapid Growth</a></li>
+                <li><a href="marketShareData.html">Economy-Wide Reach</a></li>
+                <li><a href="futureOfEmployment.html">Jobs Likely Roboticized</a></li>
+                <li><a href="byState.html">Impact by State</a></li>
                 <li><a href="employmentByOccupation.html">Employment Trends</a></li>
 
             </ul>
@@ -45,16 +45,47 @@
 <!-- Include body content here -->
 <div class="container">
 
-    <div class="page-header">
-        <h1>ROBOTICS SALES</h1>
+    <div class = "row">
+        <div class="page-header"><h1>ROBOTICS' RAPID GROWTH</h1></div>
     </div>
 
-    <div class="row explanatory-text">Explanatory text.</div>
 
-    <div class="row subtitle-units-sold">Hover over a dot for details.</div>
+    <div class = "row">
+        <div class = "col-md-6">
+            <img class="units-sold-img" src="img/robot-assembly-line.png"/>
+            <span class = "img-caption">
+                Source: Paul Sakuma/Associated Press <br> via
+                <a href=http://www.nytimes.com/2012/08/19/business/new-wave-of-adept-robots-is-changing-global-industry.html>
+                The New York Times
+                </a>
+            </span>
+        </div>
+        <div class = "col-md-6 explanatory-text"> <br><br> Text <br><br>Text </div>
+    </div>
 
-    <!-- Visualization Placeholder -->
-    <div id="robot-units-sold"></div>
+    <br><br>
+
+
+    <div class="col-md-12">
+        <div class="grey-background-plot-title"> Worldwide Robotics Sales </div>
+        <div class="grey-background-plot-subtitle"> Hover over a dot for details. </br>
+    </div>
+
+    <div class = "row">
+        <!--
+        <div class = "col-md-6 explanatory-text"> <br><br>Text <br> Text <br> </div>-->
+        <!-- Visualization-->
+        <div class = "col-md-12">
+
+            <div id="robot-units-sold"></div>
+            <div class="data-source">Source:
+                <a href = http://www.ifr.org/industrial-robots/statistics/>International Federation of Robotics, World Robot 2015 Industrial Robot Statistics</a>
+            </div>
+        </div>
+    </div>
+    <br>
+
+
 
 </div>
 

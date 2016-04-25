@@ -49,7 +49,7 @@ RobotUnitsSold = function(_parentElement, _data){
 RobotUnitsSold.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 100, right: 75, bottom: 90, left: 100 };
+    vis.margin = { top: 30, right: 75, bottom: 30, left: 100 };
 
     vis.width = 700 - vis.margin.left - vis.margin.right,
         vis.height = 550 - vis.margin.top - vis.margin.bottom;
@@ -87,13 +87,6 @@ RobotUnitsSold.prototype.initVis = function(){
 
     vis.svg.append("g").attr("class", "axis y-axis").call(vis.yAxis);
 
-    //add title
-    vis.svg.append("text")
-        .attr("class", "title")
-        .attr("x", 75)   //position relative to top corner
-        .attr("y", -20)
-        .text("Worldwide Robotics Sales");
-
     //add y-axis label
     vis.svg.append("text")
         .attr("class", "axis-label")
@@ -103,19 +96,6 @@ RobotUnitsSold.prototype.initVis = function(){
         .attr("dy", ".1em")
         .attr("transform", "rotate(-90)")  //rotate x-axis labels
         .text("Robotics Units Sold Worldwide");
-
-    //add data source
-    vis.svg.append("text")
-        .attr("class", "data-source")
-        .attr("x", vis.marginLeft)
-        .attr("y", vis.height + 60)
-        .text("Source: International Federation of Robotics, World Robot 2015 Industrial Robot Statistics");
-
-    vis.svg.append("text")
-        .attr("class", "data-source")
-        .attr("x", vis.marginLeft)
-        .attr("y", vis.height + 80)
-        .text("http://www.ifr.org/industrial-robots/statistics/");
 
     vis.makeVis();
 }

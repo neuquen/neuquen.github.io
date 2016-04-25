@@ -93,7 +93,7 @@ ByState = function(_parentElement, _data, _mapData, _probabilities){
 ByState.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 100, left: 10 };
+    vis.margin = { top: 40, right: 0, bottom: 100, left: 75 };
     vis.width = 900 - vis.margin.left - vis.margin.right,
         vis.height = 600 - vis.margin.top - vis.margin.bottom;
 
@@ -238,12 +238,16 @@ ByState.prototype.wrangleData = function(){
  */
 ByState.prototype.updateVis = function(){
     var vis = this;
+    var tipDirection = 'n';
 
     //Init tooltip
     var tip = d3.tip()
-        .attr('class', 'd3-tip')
+        .attr('class', 'd3-tip-states')
+        .direction(function(d){
+            return tipDirection;
+        })
         .html(function(d){
-            vis.hoveredState = stateNames[d.id];
+            //vis.hoveredState = stateNames[d.id];
             vis.popUpTable();
             return vis.hoverStateData(); //call helper function for field/state html
         });
@@ -269,7 +273,17 @@ ByState.prototype.updateVis = function(){
             else {
                 return "#ccc";
             } })
-        .on('mouseover', tip.show)
+        .on('mouseover', function(d){
+            vis.hoveredState = stateNames[d.id];
+            if (vis.hoveredState === 'Alaska' || vis.hoveredState === 'California' || vis.hoveredState === 'Oregon'){
+                tipDirection = 'e';
+            }
+            else {
+                console.log("setting NORTH");
+                tipDirection = 'n';
+            }
+            tip.show(d);
+        })
         .on('mouseout', tip.hide);
 
 
@@ -358,7 +372,7 @@ ByState.prototype.hoverStateData = function(){
     str += "2015 Jobs per 1000: " + Math.round(vis.beforeRobots[0].jobsPer1000) + "<br>";
     str += "2015 Number of Jobs: "+ vis.format(vis.beforeRobots[0].totalJobs)+ "<br>";
 
-    //num jobs accounting for automation
+    //num jobs accounting for automation - get data from different dictionary
     vis.afterRobots = vis.majorJobDictLikely.filter(function(item){
         return (item.jobField.indexOf(vis.selection) > -1 && item.state == vis.hoveredState);
     });
@@ -393,14 +407,14 @@ ByState.prototype.popUpTable = function(){
     //make column headers
     dataToPrint += "<tr><td>Job Title</td><td>Jobs in 2015</td><td>Probability Automated</td></tr>";
 
-    //get 6 jobs most likely to be automated
+    //get (at most) 5 jobs most likely to be automated
     for (var i = 0; i < filteredArray.length; i++){
 
         dataToPrint += "<tr><td>" + filteredArray[i].jobTitle + "</td>";
         dataToPrint += "<td>" + vis.format(filteredArray[i].numJobsWithoutComputerization) + "</td>";
         dataToPrint += "<td>" + filteredArray[i].probComputerized + "</td></tr>";
 
-        if (i == 6){
+        if (i == 5){
             break;
         }
     }
