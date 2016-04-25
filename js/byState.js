@@ -93,7 +93,7 @@ ByState = function(_parentElement, _data, _mapData, _probabilities){
 ByState.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 100, left: 75 };
+    vis.margin = { top: 40, right: 0, bottom: 100, left: 50 };
     vis.width = 900 - vis.margin.left - vis.margin.right,
         vis.height = 600 - vis.margin.top - vis.margin.bottom;
 
@@ -235,25 +235,32 @@ ByState.prototype.wrangleData = function(){
 /*
  * Draw the map.
  *
+ * tooltip east and north positions: https://gist.github.com/deanmalmgren/6638585
+ *
  */
 ByState.prototype.updateVis = function(){
     var vis = this;
-    var tipDirection = 'n';
 
     //Init tooltip
     var tip = d3.tip()
         .attr('class', 'd3-tip-states')
-        .direction(function(d){
-            return tipDirection;
-        })
         .html(function(d){
-            //vis.hoveredState = stateNames[d.id];
+            vis.hoveredState = stateNames[d.id];
             vis.popUpTable();
             return vis.hoverStateData(); //call helper function for field/state html
+        })
+        .direction(function (){
+            //position tooltip eastward for western states
+            if (vis.hoveredState == 'Alaska' || vis.hoveredState == 'California'
+                || vis.hoveredState == 'Oregon' || vis.hoveredState == 'Washington'
+                || vis.hoveredState == 'Nevada'){
+                return 'e';
+            }
+            return 'n';
         });
 
-    vis.svg.call(tip);
 
+    vis.svg.call(tip);
 
     vis.map = vis.svg.selectAll("path")
         .data(vis.USA);
@@ -273,19 +280,8 @@ ByState.prototype.updateVis = function(){
             else {
                 return "#ccc";
             } })
-        .on('mouseover', function(d){
-            vis.hoveredState = stateNames[d.id];
-            if (vis.hoveredState === 'Alaska' || vis.hoveredState === 'California' || vis.hoveredState === 'Oregon'){
-                tipDirection = 'e';
-            }
-            else {
-                console.log("setting NORTH");
-                tipDirection = 'n';
-            }
-            tip.show(d);
-        })
+        .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
-
 
     vis.map.exit().remove();
 

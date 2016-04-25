@@ -27,36 +27,12 @@
     text-align: center;
 }
 
-
-
-/* triangle extender for state maps vis */
-.d3-tip-states:after {
-    pointer-events: none;
-    box-sizing: border-box;
-    display: inline;
-    font-size: 20px;
-    width: 100%;
-    line-height: 1;
-    color: rgba(0, 0, 0, 0.8);
-    position: absolute;
-}
-
 /* Style northward tooltips differently */
-/* https://github.com/Caged/d3-tip/blob/master/examples/example-styles.css */
-.d3-tip-states.n:after {
-    content: "\25BC";
+.d3-tip.n:after {
+    pointer-events: none;
     margin: -1px 0 0 0;
     top: 100%;
     left: 0;
-    text-align:center;
-}
-
-/* Eastward tooltips */
-.d3-tip-states.e:after {
-    content: "\25C0";
-    margin: -8px 0 0 0;
-    top: 50%;
-    left: -16px;/*-8px;*/
 }
 
 div.tooltip {
