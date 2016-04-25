@@ -54,7 +54,7 @@ FutureOfEmployment.prototype.initVis = function(){
     vis.width = 900 - vis.margin.left - vis.margin.right,
         vis.height = 1500 - vis.margin.top - vis.margin.bottom;
 
-    vis.textWidth = 400;
+    vis.textWidth = 450;
 
     // SVG drawing area
     vis.svg = d3.select("#" + vis.parentElement).append("svg")
