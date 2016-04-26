@@ -459,9 +459,6 @@ body {
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
 
-body > .container {
-    padding: 60px 15px 0;
-}
 .container .text-muted {
     margin: 20px 0;
 }
@@ -508,13 +505,13 @@ h1,h2,h3,h4,h5,h6 {
 
 @media (min-width: 48em) {
     body > .container {
-        padding: 150px 15px 0;
+        padding: 150px 15px 20px;
     }
 }
 
 @media (min-width: 75em) {
     body > .container {
-        padding: 60px 15px 0;
+        padding: 60px 15px 20px;
     }
 }
 
