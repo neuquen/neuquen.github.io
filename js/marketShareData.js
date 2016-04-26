@@ -180,14 +180,15 @@ MarketShareData.prototype.makeInvisibleCircles = function(){
             return vis.y(d.ypos);
         })
         .on('mouseover', function(d, index){
-            if ($.objDragged !== "null") {  //if an object is being dragged
-                tip.show(d);
-            }
-
             if (d.sector.indexOf($.objDragged) > -1){ //if obj dragged matches circle,
                 vis.hovered = d;
                 vis.labelCircles(d);       //put sector name over circle
             }
+            else if ($.objDragged !== "null") {  //if an object is being dragged
+                tip.show(d);
+            }
+
+
         })
         .on('mouseout', function (d) {
             tip.hide(d);
