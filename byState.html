@@ -43,52 +43,37 @@
 </nav>
 
 
-<div class="container centergrid">
+<div class="container">
 
     <div class="page-header">
         <h1>IMPACT BY STATE</h1>
     </div>
 
-    <figure class="image-left">
-        <img class="by-state-img" src="img/robots-with-trays.png"/>
-        <figcaption>Source: Reuters via
-            <a href=http://www.pbs.org/newshour/updates/3-white-collar-jobs-robots-can-already-better/>
-                PBS Newshour
-            </a>
-        </figcaption>
-    </figure>
+    <div class="row">
+        <figure class="image-left">
+            <img class="by-state-img" src="img/robots-with-trays.png"/>
+            <figcaption>Source: Reuters via
+                <a href=http://www.pbs.org/newshour/updates/3-white-collar-jobs-robots-can-already-better/>
+                    PBS Newshour
+                </a>
+            </figcaption>
+        </figure>
 
-    <div class="lead">
-        <p>"Likely computerized" means that, according to the Oxford study, the occupation has a probability of 0.5 or greater of being automated.</p>
+        <p class="lead">"Likely computerized" means that, according to the Oxford study, the occupation has a probability of 0.5 or greater of being automated.</p>
     </div>
 
-</div>
-
-
 <!--Dropdowns, map, pop-up table -->
-<div class="container-fluid leftAlignGrid">
-
-
-    <div class="col-sm-12">
+    <div class="row">
         <div class="grey-background-plot-title"> Job Statistics By State </div>
         <div class="grey-background-plot-subtitle"> Pick a major job field and a metric. </br>
             Hover over a state for tooltips and a pop-up table.</div>
     </div>
-    <!--
-    <div class="row">
-        <div class = "col-sm-12 subtitle-map">Pick a major job field and a metric. </br>
-        Hover over a state for tooltips and a pop-up table. </div>
-    </div>-->
-</div>
 
-<!--Dropdowns, map, pop-up table -->
-<div class="container-fluid leftAlignGrid">
-
-    <div class="row market-size-dropdowns">
-
-        <!-- Dropdown for Major SOC Groups (http://www.bls.gov/soc/major_groups.htm) -->
-        <div class="col-sm-6 user-data">
-            <select id="mapDropdown">
+    <form class="form-inline by-state-form">
+        <div class="form-group">
+            <!-- Dropdown for Major SOC Groups (http://www.bls.gov/soc/major_groups.htm) -->
+            <label for="mapDropdown">Job Field</label>
+            <select class="form-control" id="mapDropdown">
                 <option value="Management">Management</option>
                 <option value="Business">Business and Financial Operations</option>
                 <option value="Computer">Computer and Mathematical</option>
@@ -114,20 +99,21 @@
             </select>
         </div>
 
-        <!-- Dropdown for Jobs Metrics -->
-        <div class="col-sm-4 user-data">
-            <select id="dataTypeDropdown">
+        <div class="form-group">
+            <!-- Dropdown for Jobs Metrics -->
+            <label for="dataTypeDropdown">Metric</label>
+            <select class="form-control" id="dataTypeDropdown">
                 <option value="Per1000">Jobs in Selected Field, Per 1000 Jobs in the State</option>
                 <option value="TotalJobs">Number of Jobs in Selected Field</option>
                 <option value="Likely">Jobs Per 1000, Without Jobs Likely Computerized</option>
             </select>
         </div>
-    </div>
+    </form>
 
     <!-- Map and Pop-Up Table  -->
     <div class = "row">
-        <div class="col-sm-6 centerGridCols" id="by-state"></div>
-        <div class="col-sm-4 centerGridCols map-table col-sm-offset-1"></div>
+        <div class="col-lg-8" id="by-state"></div>
+        <div class="col-lg-4 map-table"></div>
     </div>
 
 </div>
