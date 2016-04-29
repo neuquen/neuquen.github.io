@@ -93,7 +93,7 @@ ByState = function(_parentElement, _data, _mapData, _probabilities){
 ByState.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { top: 40, right: 0, bottom: 100, left: 50 };
+    vis.margin = { top: 0, right: 0, bottom: 100, left: 50 };
     vis.width = 900 - vis.margin.left - vis.margin.right,
         vis.height = 600 - vis.margin.top - vis.margin.bottom;
 
@@ -178,7 +178,7 @@ ByState.prototype.wrangleData = function(){
 
     vis.round = d3.format("d");
     vis.format = d3.format("," + this.round);
-    vis.color = d3.scale.quantize().range(colorbrewer.Blues[9]);
+    vis.color = d3.scale.quantize().range(colorbrewer.Greens[9]);
 
     //filter for new category selected, sort, and set new min/max vals
     if (vis.dataTypeSelected == "Per1000") {

@@ -291,13 +291,6 @@ h2 {
     padding:30px 0px 30px 1px;  /*top right bottom left padding */
 }
 
-
-/* center bootstrap grid columns*/
-.leftAlignGrid {
-    text-align:left;
-    /*vertical-align: top;*/
-}
-
 /* center image/text inside columns */
 .centerGridCols {
     /* resource for centering grid columns:
@@ -321,8 +314,10 @@ h2 {
     margin-left: 50px;
 }
 
-.job-metric-col{
-    margin-left: 65px;
+
+#mapDropdown{
+    text-align:right;
+    margin-right:25px;
 }
 
 #dataTypeDropDown{
@@ -347,6 +342,14 @@ h2 {
     height: 450px;
 }
 
+.by-state-form{
+    padding-top:20px;
+}
+
+#by-state {
+    position: relative;
+    left: -50px;
+}
 
 /**********************/
 /*    MARKET SIZE    */
@@ -370,12 +373,6 @@ h2 {
 
 .invisibleCircle{
     opacity: 0;
-}
-
-/* center bootstrap grid columns*/
-.centergrid {
-    text-align:center;
-    vertical-align: middle;
 }
 
 .draggable {
@@ -402,7 +399,8 @@ h2 {
     font-weight:bold;
     text-decoration:underline;
     text-align: center;
-    padding:20px 0px 0px 0px;  /*top right bottom left padding */
+    padding-top:20px;
+    margin-top:20px;
 }
 
 .grey-background-plot-subtitle {
