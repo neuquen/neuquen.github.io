@@ -315,17 +315,29 @@ h2 {
     padding:20px 0px 0px 1px;  /*top right bottom left padding */
 }
 
+.map-col{
+    /*text-align:center;*/
+    /*padding:0px 0px 0px 18px;*/  /*top right bottom left padding */
+    margin-left: 50px;
+}
+
+.job-metric-col{
+    margin-left: 65px;
+}
+
 #dataTypeDropDown{
+    /*text-align: center;*/
+    /*margin:20px;*/
+    /*padding:20px 0px 0px 0px;*/  /*top right bottom left padding */
+
+}
+
+
+.by-state-dropdowns{
     text-align: left;
-}
-
-#mapDropDown{
-    text-align:right;
-}
-
-.market-size-dropdowns{
     padding:20px 0px 0px 0px;  /*top right bottom left padding */
 }
+
 
 .map-vis-title{
     font-size:18px;
@@ -415,6 +427,9 @@ h2 {
     padding:0px 1px 40px 1px;  /*top right bottom left padding */
 }
 
+.market-size-dropdowns{
+    padding:20px 0px 0px 0px;  /*top right bottom left padding */
+}
 /*
 #market-list-subtitle {
     fill: #333;

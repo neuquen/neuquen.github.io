@@ -13,7 +13,6 @@ function loadData() {
 
         //Process and clean the data
         csv.forEach(function(d){
-            //Convert string to 'date object'
             d.Year = d3.time.format("%Y").parse(d.Year);
             d.Units = +d.Units;
         });
@@ -24,11 +23,10 @@ function loadData() {
 }
 
 /*
- * RobotUnitsSold - Object constructor function
+ * RobotUnitsSold
  * @param _parentElement 	-- the HTML element in which to draw the visualization
  * @param _data				-- the RobotUnitsSold.csv data
  */
-
 RobotUnitsSold = function(_parentElement, _data){
     this.parentElement = _parentElement;
     this.data = _data;
@@ -68,7 +66,7 @@ RobotUnitsSold.prototype.initVis = function(){
     vis.y = d3.scale.linear().range([vis.height,0]);
 
     // Define domains
-    vis.x.domain(d3.extent(vis.data, function(d){return d.Year;})); //add domains
+    vis.x.domain(d3.extent(vis.data, function(d){return d.Year;}));
     vis.y.domain([0, d3.max(vis.data, function(d) { return d.Units;})]);
 
     //set axis
