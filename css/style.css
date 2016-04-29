@@ -327,11 +327,11 @@ h2 {
 
 }
 
-
+/*
 .by-state-dropdowns{
     text-align: left;
-    padding:20px 0px 0px 0px;  /*top right bottom left padding */
-}
+    padding:20px 0px 0px 0px;
+}*/
 
 
 .map-vis-title{
@@ -349,6 +349,7 @@ h2 {
 #by-state {
     position: relative;
     left: -50px;
+    padding:20px 0px 0px 0px;
 }
 
 /**********************/

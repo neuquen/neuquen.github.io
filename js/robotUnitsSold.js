@@ -93,7 +93,7 @@ RobotUnitsSold.prototype.initVis = function(){
         .attr("y", -70)
         .attr("dy", ".1em")
         .attr("transform", "rotate(-90)")  //rotate x-axis labels
-        .text("Robotics Units Sold Worldwide");
+        .text("Industrial Robotics Units Sold Worldwide");
 
     vis.makeVis();
 }
