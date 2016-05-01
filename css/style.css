@@ -91,7 +91,6 @@ g:hover > g.group:hover, g.group {
     float: right;
     background-color: #f2f2f2;
     padding: 25px 25px 15px 25px;
-    border-radius: 5px;
     text-align:center;
 }
 
@@ -354,23 +353,19 @@ h2 {
 
 
 .grey-background-plot-title{
-    background-color: #f2f2f2;
-    fill: #333;
     font-size: 32px;
-    font-weight:bold;
-    text-decoration:underline;
     text-align: center;
-    padding-top:20px;
-    margin-top:20px;
 }
 
 .grey-background-plot-subtitle {
-    background-color: #f2f2f2;
-    fill: #333;
     font-size: 24px;
-    font-weight: bold;
     text-align: center;
-    padding:0px 0px 20px 0px;  /*top right bottom left padding */
+}
+
+.grey-background {
+    background-color: #f2f2f2;
+    padding:20px 0;
+    margin-top:20px;
 }
 
 
