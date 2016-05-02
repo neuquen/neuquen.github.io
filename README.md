@@ -58,7 +58,7 @@ js/topojson.js - [TopoJSON](https://github.com/mbostock/topojson)
 
 ## Data:
 
-Below are the data files and sources.
+Below are the data files, descriptions, and sources.
 
 data/ByState2015.csv  
   **description**: 2015 state employment by field and occupation  
@@ -66,22 +66,22 @@ data/ByState2015.csv
   http://www.bls.gov/oes/current/oessrcst.htm
 
 data/MarketShareData.csv  
-  description: projected future market sizes of robotics in major economic sectors  
-  source: Robotic Revolution - Global Robot & AI Primer, Bank of America Merril Lynch, December 2015,  http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf
+  **description**: projected future market sizes of robotics in major economic sectors  
+  **source**: Robotic Revolution - Global Robot & AI Primer, Bank of America Merril Lynch, December 2015,  http://www.bofaml.com/content/dam/boamlimages/documents/PDFs/robotics_and_ai_condensed_primer.pdf
 
 data/RobotUnitsSold.csv  
-  description: worlwide industrial robotics sales since 2004  
-  source: International Federation of Robotics, World Robot 2015 Industrial Robot Statistics, http://www.ifr.org/industrial-robots/statistics/
+  **description**: worlwide industrial robotics sales since 2004  
+  **source**: International Federation of Robotics, World Robot 2015 Industrial Robot Statistics, http://www.ifr.org/industrial-robots/statistics/
 
 data/The-Future-of-Employment.csv  
-  description: the probability of computerization for 702 occupations  
-  source: “The Future of Employment: How Susceptible are Jobs to Computerisation?”, Carl Benedikt Frey and Michael A. Osborne, Appendix, http://www.oxfordmartin.ox.ac.uk/downloads/academic/The_Future_of_Employment.pdf
+  **description**: the probability of computerization for 702 occupations  
+  **source**: “The Future of Employment: How Susceptible are Jobs to Computerisation?”, Carl Benedikt Frey and Michael A. Osborne, Appendix, http://www.oxfordmartin.ox.ac.uk/downloads/academic/The_Future_of_Employment.pdf
 
 data/employment-by-occupation.csv  
-  description: US employment and unemployment by field and occupation since 2000  
-  source: US Bureau of Labor Statistics, Employed and unemployed persons by occupation, not seasonally adjusted,  http://www.bls.gov/webapps/legacy/cpsatab13.htm and http://www.bls.gov/webapps/legacy/cpsatab14.htm
+  **description**: US employment and unemployment by field and occupation since 2000  
+  **source**: US Bureau of Labor Statistics, Employed and unemployed persons by occupation, not seasonally adjusted,  http://www.bls.gov/webapps/legacy/cpsatab13.htm and http://www.bls.gov/webapps/legacy/cpsatab14.htm
 
 data/us.json  
 data/us-state-names.tsv  
-  description: mapping data  
-  source: Mike Bostock, http://bl.ocks.org/mbostock/raw/4090846/us.json, https://gist.github.com/mbostock/4090846#file-us-state-names-tsv
+  **description**: mapping data  
+  **source**: Mike Bostock, http://bl.ocks.org/mbostock/raw/4090846/us.json, https://gist.github.com/mbostock/4090846#file-us-state-names-tsv
