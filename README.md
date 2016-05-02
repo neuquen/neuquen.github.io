@@ -9,7 +9,7 @@ This website was built for a final project in the class [CS 171 - Visualization]
 ## URLS:
 
 **Website:** http://neuquen.github.io  
-**Screencast:** http://website.com
+**Screencast:** http://screencast.com/t/hupWLNPAb
 
 ## Site Structure:
 ### HTML Pages:
