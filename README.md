@@ -60,8 +60,8 @@ js/topojson.js - [TopoJSON](https://github.com/mbostock/topojson)
 
 Below are the data files, descriptions, and sources.
 
-data/ByState2015.csv  
-  **description**: 2015 state employment by field and occupation  
+data/ByState2015Min.csv  
+  **description**: 2015 state employment by field and occupation, without unused columns 
   **source**: US Bureau of Labor Statistics, May 2015 State Occupational Employment and Wage Estimates,
   http://www.bls.gov/oes/current/oessrcst.htm
 
