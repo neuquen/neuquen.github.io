@@ -31,7 +31,7 @@ function loadData() {
     var queue = d3_queue.queue();
 
     queue
-        .defer(d3.csv, "data/ByState2015.csv")
+        .defer(d3.csv, "data/ByState2015Min.csv")
         .defer(d3.json, "data/us.json")
         .defer(d3.tsv, "data/us-state-names.tsv")
         .defer(d3.csv, "data/The-Future-of-Employment.csv")
